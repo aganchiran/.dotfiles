@@ -45,7 +45,10 @@ end
 
 -- {{{ Variable definitions
 -- Themes define colours, icons, font and wallpapers.
-beautiful.init(gears.filesystem.get_themes_dir() .. "zenburn/theme.lua")
+local config_path = gears.filesystem.get_configuration_dir()
+local themes_path = config_path .. "themes/"
+-- beautiful.init(gears.filesystem.get_themes_dir() .. "zenburn/theme.lua")
+beautiful.init(themes_path .. "spacedrol/theme.lua")
 
 -- This is used later as the default terminal and editor to run.
 terminal = "kitty"
