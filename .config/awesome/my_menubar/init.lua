@@ -115,6 +115,9 @@ menubar.right_label = "▶▶"
 -- @tfield[opt="◀◀"] string left_label
 menubar.left_label = "◀◀"
 
+menubar.prompt_label = ""
+menubar.item_template = {}
+
 -- awful.widget.common.list_update adds three times a margin of dpi(4)
 -- for each item:
 -- @tfield number list_interspace
@@ -156,7 +159,8 @@ local function label(o)
     return colortext(gstring.xml_escape(o.name), fg_color),
            bg_color,
            nil,
-           o.icon
+           o.icon,
+           menubar.item_template.style
 end
 
 local function load_count_table()
@@ -368,7 +372,8 @@ local function menulist_update(scr)
 
     common.list_update(common_args.w, nil, label,
                        common_args.data,
-                       get_current_page(shownitems, query, scr))
+                       get_current_page(shownitems, query, scr),
+                       menubar.item_template)
 end
 
 --- Refresh menubar's cache by reloading .desktop files.
@@ -400,13 +405,13 @@ local function prompt_keypressed_callback(mod, key, comm)
         if comm == "" and current_category then
             current_category = nil
             current_item = previous_item
-            return true, nil, "Run: "
+            return true, nil, menubar.prompt_label
         end
     elseif key == "Escape" then
         if current_category then
             current_category = nil
             current_item = previous_item
-            return true, nil, "Run: "
+            return true, nil, menubar.prompt_label
         end
     elseif key == "Home" then
         current_item = 1
@@ -489,7 +494,7 @@ function menubar.show(scr)
     local prompt_args = menubar.prompt_args or {}
 
     awful.prompt.run(setmetatable({
-        prompt              = "Run: ",
+        prompt              = menubar.prompt_label,
         textbox             = instance.prompt.widget,
         completion_callback = awful.completion.shell,
         history_path        = gfs.get_cache_dir() .. "/history_menu",

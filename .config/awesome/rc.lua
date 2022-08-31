@@ -103,6 +103,37 @@ mylauncher = awful.widget.launcher({ image = beautiful.awesome_icon,
 
 -- Menubar configuration
 menubar.utils.terminal = terminal -- Set the terminal for applications that require it
+menubar.show_categories = false
+menubar.geometry = {
+    width = nil,
+    height = beautiful.menubar_height,
+    x = nil,
+    y = awful.screen.focused().workarea.height - beautiful.menubar_height - (beautiful.menubar_border_width * 2),
+}
+menubar.item_template = {
+    screen  = s,
+    style = {
+        shape  = gears.shape.rounded_bar,
+    },
+    widget_template = {
+        id     = 'background_role',
+        widget = wibox.container.background,
+        {
+            widget = wibox.container.margin,
+            top = 8,
+            bottom = 8,
+            right = 10,
+            left = 10,
+            {
+                layout = wibox.layout.fixed.horizontal,
+                {
+                    id     = 'text_role',
+                    widget = wibox.widget.textbox,
+                },
+            },
+        },
+    }
+}
 -- }}}
 
 -- Keyboard map indicator and switcher
