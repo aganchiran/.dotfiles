@@ -70,6 +70,13 @@ end
 -- @beautiful beautiful.menubar_bg_focus
 -- @param color
 
+--- Menubar selected item template.
+-- @beautiful beautiful.menubar_item_template
+-- @param table
+--
+--- Menubar prompt label.
+-- @beautiful beautiful.menubar_prompt_label
+-- @param string
 
 -- menubar
 local menubar = { menu_entries = {} }
@@ -115,9 +122,6 @@ menubar.right_label = "▶▶"
 -- @tfield[opt="◀◀"] string left_label
 menubar.left_label = "◀◀"
 
-menubar.prompt_label = ""
-menubar.item_template = {}
-
 -- awful.widget.common.list_update adds three times a margin of dpi(4)
 -- for each item:
 -- @tfield number list_interspace
@@ -137,6 +141,14 @@ local instance = nil
 
 local common_args = { w = wibox.layout.fixed.horizontal(),
                       data = setmetatable({}, { __mode = 'kv' }) }
+
+local function get_menubar_prompt_label()
+    return theme.menubar_prompt_label or "Run: "
+end
+
+local function get_menubar_item_template()
+    return theme.menubar_item_template or {}
+end
 
 --- Wrap the text with the color span tag.
 -- @param s The text.
@@ -160,7 +172,7 @@ local function label(o)
            bg_color,
            nil,
            o.icon,
-           menubar.item_template.style
+           get_menubar_item_template().style
 end
 
 local function load_count_table()
@@ -373,7 +385,7 @@ local function menulist_update(scr)
     common.list_update(common_args.w, nil, label,
                        common_args.data,
                        get_current_page(shownitems, query, scr),
-                       menubar.item_template)
+                       get_menubar_item_template())
 end
 
 --- Refresh menubar's cache by reloading .desktop files.
@@ -405,13 +417,13 @@ local function prompt_keypressed_callback(mod, key, comm)
         if comm == "" and current_category then
             current_category = nil
             current_item = previous_item
-            return true, nil, menubar.prompt_label
+            return true, nil, get_menubar_prompt_label()
         end
     elseif key == "Escape" then
         if current_category then
             current_category = nil
             current_item = previous_item
-            return true, nil, menubar.prompt_label
+            return true, nil, get_menubar_prompt_label()
         end
     elseif key == "Home" then
         current_item = 1
@@ -494,7 +506,7 @@ function menubar.show(scr)
     local prompt_args = menubar.prompt_args or {}
 
     awful.prompt.run(setmetatable({
-        prompt              = menubar.prompt_label,
+        prompt              = get_menubar_prompt_label(),
         textbox             = instance.prompt.widget,
         completion_callback = awful.completion.shell,
         history_path        = gfs.get_cache_dir() .. "/history_menu",

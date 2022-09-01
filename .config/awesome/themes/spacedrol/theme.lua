@@ -4,6 +4,9 @@ local original_themes_path = require("gears.filesystem").get_themes_dir()
 local themes_path = config_path .. "themes/"
 local dpi = require("beautiful.xresources").apply_dpi
 
+local gears = require("gears")
+local wibox = require("wibox")
+
 -- {{{ Main
 local theme = {}
 theme.wallpaper = themes_path .. "spacedrol/spacedrol-background.png"
@@ -36,8 +39,41 @@ theme.border_marked = "#CC9393"
 theme.menubar_bg_focus = "#5089B9"
 theme.menubar_bg_normal = "#E63946"
 theme.menubar_border_color = theme.menubar_bg_normal
-theme.menubar_border_width = 5
-theme.menubar_height = 28
+theme.menubar_border_width = 0
+theme.menubar_height = 38
+theme.menubar_prompt_label = "Apps: "
+theme.menubar_item_template = {
+    style = {
+        shape  = gears.shape.rounded_bar,
+    },
+    widget_template = {
+        widget = wibox.container.margin,
+        top = 10,
+        bottom = 6,
+        right = 8,
+        left = 8,
+        {
+            layout = wibox.layout.fixed.vertical,
+            {
+                widget = wibox.container.margin,
+                right = 2,
+                left = 2,
+                {
+                    id     = 'text_role',
+                    widget = wibox.widget.textbox,
+                },
+            },
+            {
+                id     = 'background_role',
+                widget = wibox.container.background,
+                {
+                    widget = wibox.container.margin,
+                    top = 4,
+                }
+            },
+        },
+    }
+}
 -- }}}
 
 -- {{{ Prompt
