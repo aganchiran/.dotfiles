@@ -34,7 +34,7 @@ local function refreshTagStatus(self, c3)
         self:get_children_by_id('custom_round_bg')[1].shape_border_width = 0
 
     elseif isSelected then
-        self:get_children_by_id('custom_round_bg')[1].bg = beautiful.bg_normal
+        self:get_children_by_id('custom_round_bg')[1].bg = beautiful.bg_secondary
         self:get_children_by_id('custom_round_bg')[1].forced_width = 13
         self:get_children_by_id('custom_round_bg')[1].forced_height = 13
         self:get_children_by_id('custom_margins')[1].left = 5
@@ -50,7 +50,7 @@ local function refreshTagStatus(self, c3)
         self:get_children_by_id('custom_round_bg')[1].shape_border_width = 2
 
     else
-        self:get_children_by_id('custom_round_bg')[1].bg = beautiful.bg_normal
+        self:get_children_by_id('custom_round_bg')[1].bg = beautiful.bg_secondary
         self:get_children_by_id('custom_round_bg')[1].forced_width = 5
         self:get_children_by_id('custom_round_bg')[1].forced_height = 5
         self:get_children_by_id('custom_margins')[1].left = 9
@@ -134,53 +134,76 @@ awful.screen.connect_for_each_screen(function(s)
 
     -- Add widgets to the wibox
     s.mywibox:setup {
-        layout = wibox.layout.align.horizontal,
-        expand = 'outside',
-
-        { -- Left widgets
-            widget = wibox.container.place,
-            halign = 'left',
-            {
-                widget = wibox.container.margin,
-                margins = 5,
-                mylauncher,
-            },
-        },
+        widget = wibox.container.background,
+        id     = "background_role",
+        bg     = beautiful.invisible,
         {
-            widget = wibox.container.place,
-            {
-                widget = wibox.container.background,
-                shape  = gears.shape.rounded_bar,
-                bg     = beautiful.bg_normal,
+            layout = wibox.layout.align.horizontal,
+            expand = 'outside',
+
+            { -- Left widgets
+                widget = wibox.container.place,
+                halign = 'left',
                 {
                     widget = wibox.container.margin,
-                    margins = 8,
-                    s.mytaglist,
+                    margins = 5,
+                    mylauncher,
                 },
             },
-        },
-        { -- Right widgets
-            widget = wibox.container.place,
-            halign = 'right',
             {
-                widget = wibox.container.background,
-                shape  = gears.shape.rounded_bar,
-                bg     = beautiful.bg_normal,
-                forced_height = 30,
+                widget = wibox.container.place,
                 {
-                    widget = wibox.container.margin,
-                    top = 6,
-                    bottom = 6,
-                    right = 0,
-                    left = 10,
+                    widget = wibox.container.background,
+                    shape  = gears.shape.rounded_bar,
+                    bg     = beautiful.bg_secondary,
                     {
-                      layout = wibox.layout.fixed.horizontal,
-                      mytextclock,
-                      wibox.widget.systray(),
-                      s.mylayoutbox,
+                        widget = wibox.container.margin,
+                        margins = 8,
+                        s.mytaglist,
+                    },
+                },
+            },
+            { -- Right widgets
+                widget = wibox.container.place,
+                halign = 'right',
+                {
+                    widget = wibox.container.background,
+                    shape  = gears.shape.rounded_bar,
+                    bg     = beautiful.bg_secondary,
+                    forced_height = 30,
+                    {
+                        widget = wibox.container.margin,
+                        top = 6,
+                        bottom = 6,
+                        right = 0,
+                        left = 10,
+                        {
+                            layout = wibox.layout.fixed.horizontal,
+                            mytextclock,
+                            wibox.widget.systray(),
+                            s.mylayoutbox,
+                        },
                     },
                 },
             },
         },
     }
+end)
+
+-- Make bar transparent when there is no tiled windows
+screen.connect_signal("arrange", function (s)
+
+    local more_than_one_tiled = #s.tiled_clients >= 1
+    local wibar = s.mywibox
+
+    assert(wibar.get_children_by_id,"The given widget template did not result in a"..
+        "layout with a 'get_children_by_id' method")
+
+    local wibar_background = wibar:get_children_by_id("background_role")[1]
+
+    if more_than_one_tiled and wibar.get_children_by_id then
+        wibar_background.bg = beautiful.bg_normal
+    else
+        wibar_background.bg = beautiful.invisible
+    end
 end)

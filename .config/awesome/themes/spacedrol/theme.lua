@@ -16,28 +16,29 @@ theme.wallpaper = themes_path .. "spacedrol/spacedrol-background.png"
 theme.font      = "sans 10"
 
 -- {{{ Colors
-theme.fg_normal  = "#FFFFFF"
-theme.fg_focus   = "#FFFFFF"
-theme.fg_urgent  = "#CC9393"
-theme.bg_normal  = "#AAAAAA33"
-theme.bg_focus   = "#E63946"
-theme.bg_urgent  = "#FCF17D"
-theme.bg_systray = theme.bg_normal
+theme.fg_normal     = "#FFFFFF"
+theme.fg_focus      = "#FFFFFF"
+theme.fg_urgent     = "#CC9393"
+theme.bg_normal     = "#262A31"
+theme.bg_secondary  = "#AAAAAA33"
+theme.bg_focus      = "#E63946"
+theme.bg_urgent     = "#FCF17D"
+theme.bg_systray    = theme.bg_normal
 
-theme.invisible  = "#00000000"
+theme.invisible     = "#00000000"
 -- }}}
 
 -- {{{ Borders
 theme.useless_gap   = dpi(0)
 theme.border_width  = dpi(1)
-theme.border_normal = "#282C34"
+theme.border_normal = theme.bg_normal
 theme.border_focus  = "#5089B9"
 theme.border_marked = "#CC9393"
 -- }}}
 
 -- {{{ Menubar
 theme.menubar_bg_focus      = theme.bg_focus
-theme.menubar_bg_inner      = "#262A31"
+theme.menubar_bg_inner      = theme.bg_normal
 theme.menubar_inner_height  = 38
 theme.menubar_icon_size     = 110
 theme.menubar_prompt_label  = "Apps: "
