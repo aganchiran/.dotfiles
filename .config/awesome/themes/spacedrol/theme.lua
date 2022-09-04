@@ -36,44 +36,17 @@ theme.border_marked = "#CC9393"
 -- }}}
 
 -- {{{ Menubar
-theme.menubar_bg_focus = "#5089B9"
-theme.menubar_bg_normal = "#E63946"
-theme.menubar_border_color = theme.menubar_bg_normal
-theme.menubar_border_width = 0
-theme.menubar_height = 38
-theme.menubar_prompt_label = "Apps: "
-theme.menubar_item_template = {
-    style = {
-        shape  = gears.shape.rounded_bar,
-    },
-    widget_template = {
-        widget = wibox.container.margin,
-        top = 10,
-        bottom = 6,
-        right = 8,
-        left = 8,
-        {
-            layout = wibox.layout.fixed.vertical,
-            {
-                widget = wibox.container.margin,
-                right = 2,
-                left = 2,
-                {
-                    id     = 'text_role',
-                    widget = wibox.widget.textbox,
-                },
-            },
-            {
-                id     = 'background_role',
-                widget = wibox.container.background,
-                {
-                    widget = wibox.container.margin,
-                    top = 4,
-                }
-            },
-        },
-    }
-}
+theme.menubar_bg_focus      = theme.bg_focus
+theme.menubar_bg_inner      = "#262A31"
+theme.menubar_inner_height  = 38
+theme.menubar_icon_size     = 110
+theme.menubar_prompt_label  = "Apps: "
+
+theme.menubar_bg_normal     = theme.invisible
+theme.menubar_border_color  = theme.menubar_invisible
+theme.menubar_border_width  = 0
+theme.menubar_outer_height  = (theme.menubar_icon_size - theme.menubar_inner_height) / 2
+theme.menubar_height        = theme.menubar_outer_height + theme.menubar_inner_height
 -- }}}
 
 -- {{{ Prompt
@@ -103,6 +76,8 @@ theme.menu_width  = dpi(100)
 
 -- {{{ Misc
 theme.awesome_icon           = themes_path .. "spacedrol/logo/spacedrol-cold-icon.png"
+theme.spacedrol_cold_icon    = themes_path .. "spacedrol/logo/spacedrol-cold-icon.png"
+theme.spacedrol_hot_icon     = themes_path .. "spacedrol/logo/spacedrol-hot-icon.png"
 theme.menu_submenu_icon      = original_themes_path .. "default/submenu.png"
 -- }}}
 
@@ -174,6 +149,78 @@ theme.layout_cornerse   = themes_path .. "spacedrol/layouts/cornerse.png"
 --theme.bg_widget        = "#494B4F"
 --theme.border_widget    = "#E63946"
 -- }}}
+
+-- {{{ Templates
+theme.menubar_item_template = {
+    style = {
+        shape  = gears.shape.rounded_bar,
+    },
+    widget_template = {
+        widget  = wibox.container.margin,
+        top     = 10,
+        bottom  = 6,
+        right   = 8,
+        left    = 8,
+        {
+            layout = wibox.layout.fixed.vertical,
+            {
+                widget  = wibox.container.margin,
+                right   = 2,
+                left    = 2,
+                {
+                    id     = 'text_role',
+                    widget = wibox.widget.textbox,
+                },
+            },
+            {
+                id     = 'background_role',
+                widget = wibox.container.background,
+                {
+                    widget  = wibox.container.margin,
+                    top     = 4,
+                }
+            },
+        },
+    }
+}
+theme.menubar_layout_template = {
+  layout = wibox.layout.stack,
+  {
+    widget = wibox.container.margin,
+    top = theme.menubar_outer_height,
+    {
+      widget = wibox.container.background,
+      bg = theme.menubar_bg_inner,
+      {
+        widget = wibox.container.margin,
+        left = theme.menubar_height + 8,
+        forced_width = 1920,
+        {
+          layout = wibox.layout.fixed.horizontal,
+          {
+            widget = wibox.container.margin,
+            id = 'prompt_container_role',
+          },
+          {
+            widget = wibox.container.margin,
+            id = 'results_container_role',
+          },
+        },
+      },
+    },
+  },
+  {
+    widget = wibox.container.margin,
+    bottom = -theme.menubar_outer_height,
+    left   = -theme.menubar_outer_height,
+    {
+      widget = wibox.widget.imagebox,
+      image  = theme.spacedrol_hot_icon,
+    },
+  },
+}
+-- }}}
+
 
 return theme
 
