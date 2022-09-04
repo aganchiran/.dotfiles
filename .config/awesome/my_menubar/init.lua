@@ -31,15 +31,18 @@ local capi = {
     mouse = mouse,
     screen = screen
 }
-local gmath = require("gears.math")
 local awful = require("awful")
-local gfs = require("gears.filesystem")
 local common = require("awful.widget.common")
-local theme = require("beautiful")
-local wibox = require("wibox")
+
 local gcolor = require("gears.color")
 local gstring = require("gears.string")
 local gdebug = require("gears.debug")
+local gmath = require("gears.math")
+local gfs = require("gears.filesystem")
+
+local theme = require("beautiful")
+local wibox = require("wibox")
+local base = require("wibox.widget.base")
 
 local function get_screen(s)
     return s and capi.screen[s]
@@ -148,6 +151,39 @@ end
 
 local function get_menubar_item_template()
     return theme.menubar_item_template or {}
+end
+
+local function get_default_menubar_layout(prompt, results)
+    local layout = wibox.layout.fixed.horizontal()
+    layout:add(prompt)
+    layout:add(results)
+
+    return layout
+end
+
+local function get_menubar_layout(prompt, results)
+
+    local layout_template = theme.menubar_layout_template
+    if layout_template == nil then
+        return get_default_menubar_layout(prompt, results)
+    end
+
+    local layout = base.make_widget_from_value(layout_template)
+
+    assert(layout.get_children_by_id,"The given widget template did not result in a"..
+        "layout with a 'get_children_by_id' method")
+
+    local prompt_container = layout:get_children_by_id("prompt_container_role")[1]
+    if prompt_container ~= nil then
+        prompt_container.widget = prompt
+    end
+
+    local results_container = layout:get_children_by_id("results_container_role")[1]
+    if results_container ~= nil then
+        results_container.widget = results
+    end
+
+    return layout
 end
 
 --- Wrap the text with the color span tag.
@@ -478,9 +514,8 @@ function menubar.show(scr)
             query = nil,
             count_table = nil,
         }
-        local layout = wibox.layout.fixed.horizontal()
-        layout:add(instance.prompt)
-        layout:add(instance.widget)
+
+        local layout = get_menubar_layout(instance.prompt, instance.widget)
         instance.wibox:set_widget(layout)
     end
 
