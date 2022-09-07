@@ -13,7 +13,7 @@ theme.wallpaper = themes_path .. "spacedrol/spacedrol-background.png"
 -- }}}
 
 -- {{{ Styles
-theme.font      = "sans 10"
+theme.font      = "Iosevka Custom bold 10"
 
 -- {{{ Colors
 theme.fg_normal     = "#FFFFFF"
