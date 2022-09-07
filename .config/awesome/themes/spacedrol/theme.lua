@@ -73,6 +73,7 @@ theme.menu_width  = dpi(100)
 theme.awesome_icon           = themes_path .. "spacedrol/logo/spacedrol-cold-icon.png"
 theme.spacedrol_cold_icon    = themes_path .. "spacedrol/logo/spacedrol-cold-icon.png"
 theme.spacedrol_hot_icon     = themes_path .. "spacedrol/logo/spacedrol-hot-icon.png"
+theme.rocket_icon            = themes_path .. "spacedrol/other_icons/rocket.png"
 theme.menu_submenu_icon      = original_themes_path .. "default/submenu.png"
 -- }}}
 
@@ -196,8 +197,12 @@ theme.menubar_layout_template = {
         {
           layout = wibox.layout.align.horizontal,
           {
-            widget = wibox.widget.imagebox,
-            image  = theme.spacedrol_hot_icon,
+            widget = wibox.container.margin,
+            margins = 2,
+            {
+              widget = wibox.widget.imagebox,
+              image  = theme.rocket_icon,
+            },
           },
           {
             widget = wibox.container.margin,
