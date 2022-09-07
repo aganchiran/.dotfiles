@@ -1,6 +1,7 @@
 local awful = require("awful")
 local gears = require("gears")
 local wibox = require("wibox")
+local menubar = require("menubars.spacedrol")
 local beautiful = require("beautiful")
 
 -- Create a wibox for each screen and add it
@@ -60,11 +61,13 @@ local function refreshTagStatus(self, c3)
     end
 end
 
--- Launcher widget
-mylauncher = awful.widget.launcher({
-        image = beautiful.awesome_icon,
-        menu = mymainmenu,
-})
+mylauncher = wibox.widget {
+    widget = wibox.widget.imagebox,
+    image  = beautiful.spacedrol_cold_icon,
+}
+
+mylauncher:connect_signal("button::release", function(c) menubar.show() end)
+
 
 -- Create a textclock widget
 mytextclock = wibox.widget.textclock()

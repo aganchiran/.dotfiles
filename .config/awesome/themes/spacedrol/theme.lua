@@ -37,21 +37,15 @@ theme.border_marked = "#CC9393"
 -- }}}
 
 -- {{{ Menubar
-theme.menubar_bg_focus      = theme.bg_focus
-theme.menubar_bg_inner      = theme.bg_normal
-theme.menubar_inner_height  = 38
-theme.menubar_icon_size     = 110
-theme.menubar_prompt_label  = "Apps: "
 
-theme.menubar_bg_normal     = theme.invisible
-theme.menubar_border_color  = theme.menubar_invisible
+theme.menubar_height        = 38
 theme.menubar_border_width  = 0
-theme.menubar_outer_height  = (theme.menubar_icon_size - theme.menubar_inner_height) / 2
-theme.menubar_height        = theme.menubar_outer_height + theme.menubar_inner_height
+theme.menubar_bg_normal     = theme.bg_normal
+theme.menubar_prompt_label  = ""
 -- }}}
 
 -- {{{ Prompt
-theme.prompt_bg = theme.menubar_bg_normal
+theme.prompt_bg = theme.invisible
 theme.prompt_fg = theme.menubar_fg_normal
 -- }}}
 
@@ -185,26 +179,31 @@ theme.menubar_item_template = {
     }
 }
 theme.menubar_layout_template = {
-  layout = wibox.layout.stack,
+  layout = wibox.layout.fixed.horizontal,
   {
     widget = wibox.container.margin,
-    top = theme.menubar_outer_height,
+    left   = 80,
+    top    = 4,
+    bottom = 4,
+    right  = 8,
     {
       widget = wibox.container.background,
-      bg = theme.menubar_bg_inner,
+      shape  = gears.shape.rounded_bar,
+      bg     = theme.bg_secondary,
       {
         widget = wibox.container.margin,
-        left = theme.menubar_height + 8,
-        forced_width = 1920,
+        margins = 4,
         {
-          layout = wibox.layout.fixed.horizontal,
+          layout = wibox.layout.align.horizontal,
           {
-            widget = wibox.container.margin,
-            id = 'prompt_container_role',
+            widget = wibox.widget.imagebox,
+            image  = theme.spacedrol_hot_icon,
           },
           {
             widget = wibox.container.margin,
-            id = 'results_container_role',
+            left   = 4,
+            right  = 4,
+            id     = 'prompt_container_role',
           },
         },
       },
@@ -212,12 +211,7 @@ theme.menubar_layout_template = {
   },
   {
     widget = wibox.container.margin,
-    bottom = -theme.menubar_outer_height,
-    left   = -theme.menubar_outer_height,
-    {
-      widget = wibox.widget.imagebox,
-      image  = theme.spacedrol_hot_icon,
-    },
+    id     = 'results_container_role',
   },
 }
 -- }}}
