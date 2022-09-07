@@ -145,6 +145,10 @@ local instance = nil
 local common_args = { w = wibox.layout.fixed.horizontal(),
                       data = setmetatable({}, { __mode = 'kv' }) }
 
+function menubar.get_instance()
+    return instance
+end
+
 local function get_menubar_prompt_label()
     return theme.menubar_prompt_label or "Run: "
 end
@@ -481,42 +485,47 @@ local function prompt_keypressed_callback(mod, key, comm)
     return false
 end
 
---- Show the menubar on the given screen.
--- @param[opt] scr Screen.
--- @staticfct menubar.show
-function menubar.show(scr)
-    scr = get_screen(scr or awful.screen.focused() or 1)
+
+local function create_instance()
     local fg_color = theme.menubar_fg_normal or theme.menu_fg_normal or theme.fg_normal
     local bg_color = theme.menubar_bg_normal or theme.menu_bg_normal or theme.bg_normal
     local border_width = theme.menubar_border_width or theme.menu_border_width or 0
     local border_color = theme.menubar_border_color or theme.menu_border_color
 
+    -- Add to each category the name of its key in all_categories
+    for k, v in pairs(menubar.menu_gen.all_categories) do
+        v.key = k
+    end
+
+    if menubar.cache_entries then
+        menubar.refresh(scr)
+    end
+
+    instance = {
+        wibox = wibox{
+            ontop = true,
+            bg = bg_color,
+            fg = fg_color,
+            border_width = border_width,
+            border_color = border_color,
+        },
+        widget = common_args.w,
+        prompt = awful.widget.prompt(),
+        query  = nil,
+        count_table = nil,
+    }
+
+    local layout = get_menubar_layout(instance.prompt, instance.widget)
+    instance.wibox:set_widget(layout)
+end
+
+--- Show the menubar on the given screen.
+-- @param[opt] scr Screen.
+-- @staticfct menubar.show
+function menubar.show(scr)
+    scr = get_screen(scr or awful.screen.focused() or 1)
     if not instance then
-        -- Add to each category the name of its key in all_categories
-        for k, v in pairs(menubar.menu_gen.all_categories) do
-            v.key = k
-        end
-
-        if menubar.cache_entries then
-            menubar.refresh(scr)
-        end
-
-        instance = {
-            wibox = wibox{
-                ontop = true,
-                bg = bg_color,
-                fg = fg_color,
-                border_width = border_width,
-                border_color = border_color,
-            },
-            widget = common_args.w,
-            prompt = awful.widget.prompt(),
-            query = nil,
-            count_table = nil,
-        }
-
-        local layout = get_menubar_layout(instance.prompt, instance.widget)
-        instance.wibox:set_widget(layout)
+        create_instance()
     end
 
     if instance.wibox.visible then -- Menu already shown, exit
@@ -531,7 +540,7 @@ function menubar.show(scr)
     instance.geometry = {x = geometry.x or scrgeom.x,
                              y = geometry.y or scrgeom.y,
                              height = geometry.height or gmath.round(theme.get_font_height() * 1.5),
-                             width = (geometry.width or scrgeom.width) - border_width * 2}
+                             width = (geometry.width or scrgeom.width) - instance.wibox.border_width * 2}
     instance.wibox:geometry(instance.geometry)
 
     current_item = 1
