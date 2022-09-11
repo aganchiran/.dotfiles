@@ -26,6 +26,8 @@ theme.bg_urgent     = "#FCF17D"
 theme.bg_systray    = theme.bg_normal
 
 theme.invisible     = "#00000000"
+theme.shadow_color  = "#00000088"
+theme.shadow_size   = 5
 -- }}}
 
 -- {{{ Borders
@@ -42,6 +44,11 @@ theme.menubar_height        = 38
 theme.menubar_border_width  = 0
 theme.menubar_bg_normal     = theme.bg_normal
 theme.menubar_prompt_label  = ""
+-- }}}
+
+-- {{{ Titlebar
+theme.titlebar_bg   = theme.bg_normal
+theme.titlebar_fg   = theme.fg_normal
 -- }}}
 
 -- {{{ Prompt
@@ -73,6 +80,7 @@ theme.menu_width  = dpi(100)
 theme.awesome_icon           = themes_path .. "spacedrol/logo/spacedrol-cold-icon.png"
 theme.spacedrol_cold_icon    = themes_path .. "spacedrol/logo/spacedrol-cold-icon.png"
 theme.spacedrol_hot_icon     = themes_path .. "spacedrol/logo/spacedrol-hot-icon.png"
+theme.spacedrol_earth_icon   = themes_path .. "spacedrol/logo/spacedrol-earth-icon.png"
 theme.rocket_icon            = themes_path .. "spacedrol/other_icons/rocket.png"
 theme.menu_submenu_icon      = original_themes_path .. "default/submenu.png"
 -- }}}
