@@ -157,7 +157,7 @@ local function get_right_shadows()
   return get_edge_shadow("right")
 end
 
-local function get_sun()
+local function get_sun(c)
 
   local top_margin  = get_empty_space_above_title() + sun_ypos - (sun_size / 2)
   local left_margin = get_left_titlebar_size() + sun_xpos - (sun_size / 2)
@@ -168,13 +168,40 @@ local function get_sun()
       left   = left_margin,
       bottom = get_top_titlebar_size() - top_margin - sun_size,
       {
+        layout = wibox.layout.stack,
+        {
           widget = wibox.widget.imagebox,
-          image  = beautiful.spacedrol_hot_icon,
+          image = beautiful.spacedrol_hot_icon,
+        },
+        {
+          layout = wibox.layout.fixed.horizontal,
+          {
+            widget = wibox.container.margin,
+            top = 5,
+            left = 5,
+            bottom = 15,
+            {
+              widget = wibox.container.background,
+              --bg = "#ff0000",
+              forced_width = 25,
+              awful.titlebar.widget.button(
+                c,
+                "Tile",
+                function() end,
+                function()
+                  if not c.fixed then
+                    c.floating = not c.floating
+                  end
+                end
+              ),
+            },
+          },
+        },
       },
   }
 end
 
-local function get_moon()
+local function get_moon(c)
   local top_margin  = get_empty_space_above_title() + moon_ypos - (moon_size / 2)
   local left_margin = get_left_titlebar_size() + moon_xpos - (moon_size / 2)
 
@@ -184,13 +211,35 @@ local function get_moon()
       left   = left_margin,
       bottom = get_top_titlebar_size() - top_margin - moon_size,
       {
+        layout = wibox.layout.stack,
+        {
           widget = wibox.widget.imagebox,
-          image  = beautiful.spacedrol_cold_icon,
+          image = beautiful.spacedrol_cold_icon,
+        },
+        {
+          layout = wibox.layout.fixed.horizontal,
+          {
+            widget = wibox.container.margin,
+            margins = 5,
+            {
+              widget = wibox.container.background,
+              --bg = "#00ff00",
+              forced_width = 45,
+              awful.titlebar.widget.button(
+                c,
+                "Close",
+                function() end,
+                function() c:kill() end
+              ),
+            },
+          },
+        },
       },
   }
 end
 
-local function get_earth(titlebar)
+local function get_earth(c, titlebar)
+
   if (titlebar == "top") then
     local top_margin  = get_empty_space_above_title() + earth_ypos - (earth_size / 2)
     local left_margin = get_left_titlebar_size() + earth_xpos - (earth_size / 2)
@@ -201,8 +250,56 @@ local function get_earth(titlebar)
       left   = left_margin,
       bottom = get_top_titlebar_size() - top_margin - earth_size,
       {
-        widget = wibox.widget.imagebox,
-        image  = beautiful.spacedrol_earth_icon,
+        layout = wibox.layout.stack,
+        {
+          widget = wibox.widget.imagebox,
+          image = beautiful.spacedrol_earth_icon,
+        },
+        {
+          layout = wibox.layout.fixed.horizontal,
+          {
+            widget = wibox.container.margin,
+            top = 5,
+            left = 15,
+            {
+              widget = wibox.container.background,
+              --bg = "#ff00ff",
+              forced_width = 26,
+              awful.titlebar.widget.button(
+                c,
+                "Fullscreen",
+                function() end,
+                function()
+                  if not c.fixed then
+                    c.fullscreen = not c.fullscreen
+                    c:raise()
+                  end
+                end
+              ),
+            },
+          },
+          {
+            widget = wibox.container.margin,
+            top = 23,
+            left = 0,
+            {
+              widget = wibox.container.background,
+              --bg = "#ff00ff",
+              forced_width = 20,
+              awful.titlebar.widget.button(
+                c,
+                "Fullscreen",
+                function() end,
+                function()
+                  if not c.fixed then
+                    c.fullscreen = not c.fullscreen
+                    c:raise()
+                  end
+                end
+              ),
+            },
+          },
+        },
       },
     }
   else
@@ -215,10 +312,37 @@ local function get_earth(titlebar)
       left   = left_margin,
       right  = get_left_titlebar_size() - left_margin - earth_size,
       {
+        layout = wibox.layout.stack,
+        {
           widget = wibox.widget.imagebox,
-          image  = beautiful.spacedrol_earth_icon,
+          image = beautiful.spacedrol_earth_icon,
+        },
+        {
+          layout = wibox.layout.fixed.vertical,
+          {
+            widget = wibox.container.margin,
+            top = 22,
+            left = 5,
+            {
+              widget = wibox.container.background,
+              --bg = "#ff00ff",
+              forced_height = 63,
+              awful.titlebar.widget.button(
+                c,
+                "Fullscreen",
+                function() end,
+                function()
+                  if not c.fixed then
+                    c.fullscreen = not c.fullscreen
+                    c:raise()
+                  end
+                end
+              ),
+            },
+          },
+        },
       },
-      }
+    }
   end
 end
 
@@ -229,6 +353,18 @@ local function get_color(c)
 end
 
 local function get_title(c, overlap_content_color)
+
+  -- buttons for the titlebar
+  local buttons = gears.table.join(
+      awful.button({ }, 1, function()
+          c:emit_signal("request::activate", "titlebar", {raise = true})
+          awful.mouse.client.move(c)
+      end),
+      awful.button({ }, 3, function()
+          c:emit_signal("request::activate", "titlebar", {raise = true})
+          awful.mouse.client.resize(c)
+      end)
+  )
 
   local empty_space_above_title = {
     widget = wibox.container.margin,
@@ -251,8 +387,12 @@ local function get_title(c, overlap_content_color)
           left   = moon_xpos + (moon_size / 2),
           right  = moon_xpos + (moon_size / 2),
           {
-            widget = awful.titlebar.widget.titlewidget(c),
-            align  = "center",
+            layout  = wibox.layout.flex.horizontal,
+            buttons = buttons,
+            {
+              widget = awful.titlebar.widget.titlewidget(c),
+              align  = "center",
+            },
           },
         },
     },
@@ -309,55 +449,38 @@ client.connect_signal("request::titlebars", function(c)
 
   top_tb : setup {
       layout = wibox.layout.stack,
-      get_sun(),
-      get_earth("top"),
+      get_sun(c),
+      get_earth(c, "top"),
       get_top_shadows(),
       get_title(c),
-      get_moon(),
+      get_moon(c),
   }
 
   bottom_tb : setup(get_bottom_shadows())
 
   left_tb: setup {
      layout = wibox.layout.stack,
-     get_earth("left"),
+     get_earth(c, "left"),
      get_left_shadows(),
   }
 
   right_tb : setup(get_right_shadows())
 
--- Callback
-  c._cb_add_window_decorations =
-      function()
-          gtimer_weak_start_new(
-              0.03, function()
-                local calculated_color = get_color(c)
+  gtimer_weak_start_new(0.03,
+    function()
+      local calculated_color = get_color(c)
 
-                top_tb : setup {
-                  layout = wibox.layout.stack,
-                  get_sun(),
-                  get_earth("top"),
-                  get_top_shadows(),
-                  get_title(c, calculated_color),
-                  get_moon(),
-                }
+      top_tb : setup {
+        layout = wibox.layout.stack,
+        get_sun(c),
+        get_earth(c, "top"),
+        get_top_shadows(),
+        get_title(c, calculated_color),
+        get_moon(c),
+      }
 
-                c:disconnect_signal("request::activate", c._cb_add_window_decorations)
-              end)
-      end
-
-  c:connect_signal("request::activate", c._cb_add_window_decorations)
-
-  -- buttons for the titlebar
-  local buttons = gears.table.join(
-      awful.button({ }, 1, function()
-          c:emit_signal("request::activate", "titlebar", {raise = true})
-          awful.mouse.client.move(c)
-      end),
-      awful.button({ }, 3, function()
-          c:emit_signal("request::activate", "titlebar", {raise = true})
-          awful.mouse.client.resize(c)
-      end)
+      c:disconnect_signal("request::activate", c._cb_add_window_decorations)
+    end
   )
 
 end)
