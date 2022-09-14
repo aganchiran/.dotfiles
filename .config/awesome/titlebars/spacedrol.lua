@@ -486,3 +486,16 @@ client.connect_signal("request::titlebars", function(c)
 end)
 
 awful.titlebar.enable_tooltip = false
+client.connect_signal("property::floating", function(c)
+    if(c.floating) then
+        awful.titlebar.show(c, "top")
+        awful.titlebar.show(c, "bottom")
+        awful.titlebar.show(c, "left")
+        awful.titlebar.show(c, "right")
+    else
+        awful.titlebar.hide(c, "top")
+        awful.titlebar.hide(c, "bottom")
+        awful.titlebar.hide(c, "left")
+        awful.titlebar.hide(c, "right")
+    end
+end)
