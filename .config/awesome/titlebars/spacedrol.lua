@@ -4,6 +4,7 @@ local awful = require("awful")
 local wibox = require("wibox")
 local beautiful = require("beautiful")
 local naughty = require("naughty")
+local animations = require("lib.animations")
 
 local lgi = require("lgi")
 local gdk = lgi.Gdk
@@ -157,16 +158,17 @@ local function get_right_shadows()
   return get_edge_shadow("right")
 end
 
-local function get_sun(c)
+local function get_sun(c, x_offset, y_offset, opacity)
 
-  local top_margin  = get_empty_space_above_title() + sun_ypos - (sun_size / 2)
-  local left_margin = get_left_titlebar_size() + sun_xpos - (sun_size / 2)
+  local top_margin  = get_empty_space_above_title() + sun_ypos - (sun_size / 2) + (y_offset or 0)
+  local left_margin = get_left_titlebar_size() + sun_xpos - (sun_size / 2) + (x_offset or 0)
 
   return {
-      widget = wibox.container.margin,
-      top    = top_margin,
-      left   = left_margin,
-      bottom = get_top_titlebar_size() - top_margin - sun_size,
+      widget  = wibox.container.margin,
+      top     = top_margin,
+      left    = left_margin,
+      bottom  = get_top_titlebar_size() - top_margin - sun_size,
+      opacity = opacity,
       {
         layout = wibox.layout.stack,
         {
@@ -201,15 +203,16 @@ local function get_sun(c)
   }
 end
 
-local function get_moon(c)
-  local top_margin  = get_empty_space_above_title() + moon_ypos - (moon_size / 2)
-  local left_margin = get_left_titlebar_size() + moon_xpos - (moon_size / 2)
+local function get_moon(c, x_offset, y_offset, opacity)
+  local top_margin  = get_empty_space_above_title() + moon_ypos - (moon_size / 2) + (y_offset or 0)
+  local left_margin = get_left_titlebar_size() + moon_xpos - (moon_size / 2) + (x_offset or 0)
 
   return {
-      widget = wibox.container.margin,
-      top    = top_margin,
-      left   = left_margin,
-      bottom = get_top_titlebar_size() - top_margin - moon_size,
+      widget  = wibox.container.margin,
+      top     = top_margin,
+      left    = left_margin,
+      bottom  = get_top_titlebar_size() - top_margin - moon_size,
+      opacity = opacity,
       {
         layout = wibox.layout.stack,
         {
@@ -238,17 +241,18 @@ local function get_moon(c)
   }
 end
 
-local function get_earth(c, titlebar)
+local function get_earth(c, titlebar, x_offset, y_offset, opacity)
 
   if (titlebar == "top") then
-    local top_margin  = get_empty_space_above_title() + earth_ypos - (earth_size / 2)
-    local left_margin = get_left_titlebar_size() + earth_xpos - (earth_size / 2)
+    local top_margin  = get_empty_space_above_title() + earth_ypos - (earth_size / 2) + (y_offset or 0)
+    local left_margin = get_left_titlebar_size() + earth_xpos - (earth_size / 2) + (x_offset or 0)
 
     return {
-      widget = wibox.container.margin,
-      top    = top_margin,
-      left   = left_margin,
-      bottom = get_top_titlebar_size() - top_margin - earth_size,
+      widget  = wibox.container.margin,
+      top     = top_margin,
+      left    = left_margin,
+      bottom  = get_top_titlebar_size() - top_margin - earth_size,
+      opacity = opacity,
       {
         layout = wibox.layout.stack,
         {
@@ -303,14 +307,15 @@ local function get_earth(c, titlebar)
       },
     }
   else
-    local top_margin  = get_empty_space_above_title() + earth_ypos - (earth_size / 2) - get_top_titlebar_size()
-    local left_margin = get_left_titlebar_size() + earth_xpos - (earth_size / 2)
+    local top_margin  = get_empty_space_above_title() + earth_ypos - (earth_size / 2) - get_top_titlebar_size() + (y_offset or 0)
+    local left_margin = get_left_titlebar_size() + earth_xpos - (earth_size / 2) + (x_offset or 0)
 
     return {
-      widget = wibox.container.margin,
-      top    = top_margin,
-      left   = left_margin,
-      right  = get_left_titlebar_size() - left_margin - earth_size,
+      widget  = wibox.container.margin,
+      top     = top_margin,
+      left    = left_margin,
+      right   = get_left_titlebar_size() - left_margin - earth_size,
+      opacity = opacity,
       {
         layout = wibox.layout.stack,
         {
@@ -347,7 +352,7 @@ local function get_earth(c, titlebar)
 end
 
 local function get_color(c)
-    pb = pixbuf_get_from_surface(gears.surface(c.content), 200, 2, 1, 1)
+    pb = pixbuf_get_from_surface(gears.surface(c.content), 200, 3, 1, 1)
         bytes = pb:get_pixels()
         return "#" .. bytes:gsub(".", function(c) return ("%02x"):format(c:byte()) end)
 end
@@ -423,6 +428,8 @@ end
 -- Add a titlebar if titlebars_enabled is set to true in the rules.
 client.connect_signal("request::titlebars", function(c)
 
+  local overlap_color = beautiful.titlebar_bg
+
   local top_tb = awful.titlebar(c, {
       position = 'top',
       bg = beautiful.invisible,
@@ -466,22 +473,87 @@ client.connect_signal("request::titlebars", function(c)
 
   right_tb : setup(get_right_shadows())
 
-  gtimer_weak_start_new(0.03,
-    function()
-      local calculated_color = get_color(c)
+  local sun_opacity = 0
+  local sun_x_offset = 10
+  local sun_y_offset = 10
+  local moon_opacity = 0
+  local moon_x_offset = 20
+  local moon_y_offset = -20
+  local earth_opacity = 0
+  local earth_x_offset = 30
 
-      top_tb : setup {
-        layout = wibox.layout.stack,
-        get_sun(c),
-        get_earth(c, "top"),
-        get_top_shadows(),
-        get_title(c, calculated_color),
-        get_moon(c),
-      }
+  local sun_timed = animations:new({
+      pos = 1,
+      duration = 0.5,
+      easing = animations.easing.outQuad,
+      update = function(self, t)
+        sun_x_offset = 10 * t
+        sun_y_offset = 10 * t
+        sun_opacity = 1 - t
+      end
+  })
 
-      c:disconnect_signal("request::activate", c._cb_add_window_decorations)
-    end
-  )
+  local moon_timed = animations:new({
+      pos = 1,
+      duration = 0.5,
+      easing = animations.easing.outQuad,
+      update = function(self, t)
+        moon_x_offset = 20 * t
+        moon_y_offset = -20 * t
+        moon_opacity = 1 - t
+      end
+  })
+
+  local earth_timed = animations:new({
+      pos = 1,
+      duration = 0.5,
+      easing = animations.easing.outQuad,
+      update = function(self, t)
+        earth_x_offset = 30 * t
+        earth_opacity = 1 - t
+      end
+  })
+
+  local titlebar_icons_timed = animations:new({
+      pos = 0.8,
+      duration = 1,
+      easing = animations.easing.linear,
+      update = function(self, t)
+        top_tb : setup {
+          layout = wibox.layout.stack,
+          get_sun(c, sun_x_offset, sun_y_offset, sun_opacity),
+          get_earth(c, "top", earth_x_offset, 0, earth_opacity),
+          get_top_shadows(),
+          get_title(c, overlap_color),
+          get_moon(c, moon_x_offset, moon_y_offset, moon_opacity),
+        }
+
+        left_tb: setup {
+          layout = wibox.layout.stack,
+          get_earth(c, "left", earth_x_offset, 0, earth_opacity),
+          get_left_shadows(),
+        }
+      end
+  })
+  titlebar_icons_timed:set(0)
+  earth_timed:set(0)
+
+
+  gears.timer.start_new(0.3, function()
+    sun_timed:set(0)
+  end)
+
+  gears.timer.start_new(0.1,function()
+    moon_timed:set(0)
+  end)
+
+  gtimer_weak_start_new(0.02,function()
+    overlap_color = get_color(c)
+  end)
+
+  c:connect_signal("unmanage", function(c)
+    titlebar_icons_timed:stop()
+  end)
 
 end)
 
