@@ -29,6 +29,7 @@ spacedrol_icon_box:setup {
 
 awful.placement.bottom_left(spacedrol_icon_box, { margins = {bottom = -31, left = -31}, parent = awful.screen.focused()})
 
+menubar_shown = false
 menubar_body_timed = rubato.timed {
     intro = 0.2,
     duration = 0.4,
@@ -44,10 +45,7 @@ menubar_body_timed = rubato.timed {
                 menubar.get_instance().wibox.visible = false
                 spacedrol_icon_box.visible = false
                 menubar.get_instance().query = nil
-            end
-
-            if menubar_width == 1920 then
-                menubar_icon_timed = 1
+                menubar_shown = false
             end
 
             menubar.get_instance().wibox.width = menubar_width
@@ -65,6 +63,13 @@ end
 local original_menubar_show = menubar.show
 function menubar.show()
 
+  if (menubar_shown) then
+    menubar.get_instance().wibox.visible = false
+    spacedrol_icon_box.visible = false
+    menubar.get_instance().query = nil
+    menubar_shown = false
+  end
+
   if not instance then
     theme_icon()
   end
@@ -73,6 +78,7 @@ function menubar.show()
 
   menubar_body_timed.target = 1
   spacedrol_icon_box.visible = true
+  menubar_shown = true
 end
 
 function menubar.hide()
