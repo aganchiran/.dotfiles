@@ -158,197 +158,235 @@ local function get_right_shadows()
   return get_edge_shadow("right")
 end
 
-local function get_sun(c, x_offset, y_offset, opacity)
+local function get_sun(c)
+  local x_offset = 20
+  local y_offset = 20
 
-  local top_margin  = get_empty_space_above_title() + sun_ypos - (sun_size / 2) + (y_offset or 0)
-  local left_margin = get_left_titlebar_size() + sun_xpos - (sun_size / 2) + (x_offset or 0)
+  local top_margin  = get_empty_space_above_title() + sun_ypos - (sun_size / 2)
+  local left_margin = get_left_titlebar_size() + sun_xpos - (sun_size / 2)
 
-  return {
-      widget  = wibox.container.margin,
-      top     = top_margin,
-      left    = left_margin,
-      bottom  = get_top_titlebar_size() - top_margin - sun_size,
-      opacity = opacity,
+  local sun = wibox.container.margin()
+  sun.top     = top_margin + y_offset
+  sun.left    = left_margin + x_offset
+  sun.bottom  = get_top_titlebar_size() - sun.top - sun_size
+  sun.opacity = 0
+
+  sun:setup {
+    layout = wibox.layout.stack,
+    {
+      widget = wibox.widget.imagebox,
+      image = beautiful.spacedrol_hot_icon,
+    },
+    {
+      layout = wibox.layout.fixed.horizontal,
       {
-        layout = wibox.layout.stack,
+        widget = wibox.container.margin,
+        top = 5,
+        left = 5,
+        bottom = 15,
         {
-          widget = wibox.widget.imagebox,
-          image = beautiful.spacedrol_hot_icon,
-        },
-        {
-          layout = wibox.layout.fixed.horizontal,
-          {
-            widget = wibox.container.margin,
-            top = 5,
-            left = 5,
-            bottom = 15,
-            {
-              widget = wibox.container.background,
-              --bg = "#ff0000",
-              forced_width = 25,
-              awful.titlebar.widget.button(
-                c,
-                "Tile",
-                function() end,
-                function()
-                  if not c.fixed then
-                    c.floating = not c.floating
-                  end
-                end
-              ),
-            },
-          },
+          widget = wibox.container.background,
+          --bg = "#ff0000",
+          forced_width = 25,
+          awful.titlebar.widget.button(
+            c,
+            "Tile",
+            function() end,
+            function()
+              if not c.fixed then
+                c.floating = not c.floating
+              end
+            end
+          ),
         },
       },
+    },
   }
+
+  local sun_timed = animations:new({
+      pos = 1,
+      duration = 0.5,
+      easing = animations.easing.outQuad,
+      update = function(self, t)
+        sun.top = top_margin + y_offset * t
+        sun.left = left_margin + x_offset * t
+        sun.bottom  = get_top_titlebar_size() - sun.top - sun_size
+        sun.opacity = 1 - t
+      end
+  })
+
+  sun.timed = sun_timed
+
+  return sun
 end
 
-local function get_moon(c, x_offset, y_offset, opacity)
-  local top_margin  = get_empty_space_above_title() + moon_ypos - (moon_size / 2) + (y_offset or 0)
-  local left_margin = get_left_titlebar_size() + moon_xpos - (moon_size / 2) + (x_offset or 0)
+local function get_moon(c)
+  local x_offset = 20
+  local y_offset = -20
 
-  return {
-      widget  = wibox.container.margin,
-      top     = top_margin,
-      left    = left_margin,
-      bottom  = get_top_titlebar_size() - top_margin - moon_size,
-      opacity = opacity,
+  local top_margin  = get_empty_space_above_title() + moon_ypos - (moon_size / 2)
+  local left_margin = get_left_titlebar_size() + moon_xpos - (moon_size / 2)
+
+  local moon = wibox.container.margin()
+  moon.top     = top_margin + y_offset
+  moon.left    = left_margin + x_offset
+  moon.bottom  = get_top_titlebar_size() - moon.top - moon_size
+  moon.opacity = 0
+
+  moon:setup {
+    layout = wibox.layout.stack,
+    {
+      widget = wibox.widget.imagebox,
+      image = beautiful.spacedrol_cold_icon,
+    },
+    {
+      layout = wibox.layout.fixed.horizontal,
       {
-        layout = wibox.layout.stack,
+        widget = wibox.container.margin,
+        margins = 5,
         {
-          widget = wibox.widget.imagebox,
-          image = beautiful.spacedrol_cold_icon,
-        },
-        {
-          layout = wibox.layout.fixed.horizontal,
-          {
-            widget = wibox.container.margin,
-            margins = 5,
-            {
-              widget = wibox.container.background,
-              --bg = "#00ff00",
-              forced_width = 45,
-              awful.titlebar.widget.button(
-                c,
-                "Close",
-                function() end,
-                function() c:kill() end
-              ),
-            },
-          },
+          widget = wibox.container.background,
+          --bg = "#00ff00",
+          forced_width = 45,
+          awful.titlebar.widget.button(
+            c,
+            "Close",
+            function() end,
+            function() c:kill() end
+          ),
         },
       },
+    },
   }
+
+  local moon_timed = animations:new({
+      pos = 1,
+      duration = 0.5,
+      easing = animations.easing.outQuad,
+      update = function(self, t)
+        moon.top = top_margin + y_offset * t
+        moon.left = left_margin + x_offset * t
+        moon.bottom  = get_top_titlebar_size() - moon.top - moon_size
+        moon.opacity = 1 - t
+      end
+  })
+
+  moon.timed = moon_timed
+
+  return moon
 end
 
-local function get_earth(c, titlebar, x_offset, y_offset, opacity)
+local function get_earth(c)
+  local x_offset = 30
+  local y_offset = 0
 
-  if (titlebar == "top") then
-    local top_margin  = get_empty_space_above_title() + earth_ypos - (earth_size / 2) + (y_offset or 0)
-    local left_margin = get_left_titlebar_size() + earth_xpos - (earth_size / 2) + (x_offset or 0)
+  local earth_button_hitbox = awful.titlebar.widget.button(
+    c,
+    "Fullscreen",
+    function() end,
+    function()
+      if not c.fixed then
+        c.fullscreen = not c.fullscreen
+        c:raise()
+      end
+    end
+  )
 
-    return {
-      widget  = wibox.container.margin,
-      top     = top_margin,
-      left    = left_margin,
-      bottom  = get_top_titlebar_size() - top_margin - earth_size,
-      opacity = opacity,
+  local top_earth_top_margin  = get_empty_space_above_title() + earth_ypos - (earth_size / 2)
+  local top_earth_left_margin = get_left_titlebar_size() + earth_xpos - (earth_size / 2)
+
+  local top_earth = wibox.container.margin()
+  top_earth.top     = top_earth_top_margin + y_offset
+  top_earth.left    = top_earth_left_margin + x_offset
+  top_earth.bottom  = get_top_titlebar_size() - top_earth.top - earth_size
+  top_earth.opacity = 0
+
+  top_earth:setup {
+    layout = wibox.layout.stack,
+    {
+      widget = wibox.widget.imagebox,
+      image = beautiful.spacedrol_earth_icon,
+    },
+    {
+      layout = wibox.layout.fixed.horizontal,
       {
-        layout = wibox.layout.stack,
+        widget = wibox.container.margin,
+        top = 5,
+        left = 15,
         {
-          widget = wibox.widget.imagebox,
-          image = beautiful.spacedrol_earth_icon,
-        },
-        {
-          layout = wibox.layout.fixed.horizontal,
-          {
-            widget = wibox.container.margin,
-            top = 5,
-            left = 15,
-            {
-              widget = wibox.container.background,
-              --bg = "#ff00ff",
-              forced_width = 26,
-              awful.titlebar.widget.button(
-                c,
-                "Fullscreen",
-                function() end,
-                function()
-                  if not c.fixed then
-                    c.fullscreen = not c.fullscreen
-                    c:raise()
-                  end
-                end
-              ),
-            },
-          },
-          {
-            widget = wibox.container.margin,
-            top = 23,
-            left = 0,
-            {
-              widget = wibox.container.background,
-              --bg = "#ff00ff",
-              forced_width = 20,
-              awful.titlebar.widget.button(
-                c,
-                "Fullscreen",
-                function() end,
-                function()
-                  if not c.fixed then
-                    c.fullscreen = not c.fullscreen
-                    c:raise()
-                  end
-                end
-              ),
-            },
-          },
+          widget = wibox.container.background,
+          --bg = "#ff00ff",
+          forced_width = 26,
+          earth_button_hitbox,
         },
       },
-    }
-  else
-    local top_margin  = get_empty_space_above_title() + earth_ypos - (earth_size / 2) - get_top_titlebar_size() + (y_offset or 0)
-    local left_margin = get_left_titlebar_size() + earth_xpos - (earth_size / 2) + (x_offset or 0)
-
-    return {
-      widget  = wibox.container.margin,
-      top     = top_margin,
-      left    = left_margin,
-      right   = get_left_titlebar_size() - left_margin - earth_size,
-      opacity = opacity,
       {
-        layout = wibox.layout.stack,
+        widget = wibox.container.margin,
+        top = 23,
+        left = 0,
         {
-          widget = wibox.widget.imagebox,
-          image = beautiful.spacedrol_earth_icon,
-        },
-        {
-          layout = wibox.layout.fixed.vertical,
-          {
-            widget = wibox.container.margin,
-            top = 22,
-            left = 5,
-            {
-              widget = wibox.container.background,
-              --bg = "#ff00ff",
-              forced_height = 63,
-              awful.titlebar.widget.button(
-                c,
-                "Fullscreen",
-                function() end,
-                function()
-                  if not c.fixed then
-                    c.fullscreen = not c.fullscreen
-                    c:raise()
-                  end
-                end
-              ),
-            },
-          },
+          widget = wibox.container.background,
+          --bg = "#ff00ff",
+          forced_width = 20,
+          earth_button_hitbox,
         },
       },
-    }
-  end
+    },
+  }
+
+  local left_earth_top_margin  = get_empty_space_above_title() + earth_ypos - (earth_size / 2) - get_top_titlebar_size()
+  local left_earth_left_margin = get_left_titlebar_size() + earth_xpos - (earth_size / 2)
+
+  local left_earth = wibox.container.margin()
+  left_earth.top     = left_earth_top_margin + y_offset
+  left_earth.left    = left_earth_left_margin + x_offset
+  left_earth.right   = get_left_titlebar_size() - left_earth.left - earth_size
+  left_earth.opacity = 0
+
+  left_earth:setup {
+    layout = wibox.layout.stack,
+    {
+      widget = wibox.widget.imagebox,
+      image = beautiful.spacedrol_earth_icon,
+    },
+    {
+      layout = wibox.layout.fixed.vertical,
+      {
+        widget = wibox.container.margin,
+        top = 22,
+        left = 5,
+        {
+          widget = wibox.container.background,
+          --bg = "#ff00ff",
+          forced_height = 63,
+          earth_button_hitbox,
+        },
+      },
+    },
+  }
+
+  local earth_timed = animations:new({
+      pos = 1,
+      duration = 0.5,
+      easing = animations.easing.outQuad,
+      update = function(self, t)
+        top_earth.top     = top_earth_top_margin + y_offset * t
+        top_earth.left    = top_earth_left_margin + x_offset * t
+        top_earth.bottom  = get_top_titlebar_size() - top_earth.top - earth_size
+        top_earth.opacity = 1 - t
+
+        left_earth.top     = left_earth_top_margin + y_offset * t
+        left_earth.left    = left_earth_left_margin + x_offset * t
+        left_earth.right   = get_left_titlebar_size() - left_earth.left - earth_size
+        left_earth.opacity = 1 - t
+      end
+  })
+
+  return {
+    top_earth = top_earth,
+    left_earth = left_earth,
+    earth_timed = earth_timed,
+  }
 end
 
 local function get_color(c)
@@ -357,7 +395,7 @@ local function get_color(c)
         return "#" .. bytes:gsub(".", function(c) return ("%02x"):format(c:byte()) end)
 end
 
-local function get_title(c, overlap_content_color)
+local function get_title(c)
 
   -- buttons for the titlebar
   local buttons = gears.table.join(
@@ -376,7 +414,7 @@ local function get_title(c, overlap_content_color)
     top = get_empty_space_above_title(),
   }
 
-  local title = {
+  local title_box = {
     widget = wibox.container.margin,
     left = get_left_titlebar_size(),
     right = get_right_titlebar_size(),
@@ -403,32 +441,33 @@ local function get_title(c, overlap_content_color)
     },
   }
 
-  local fake_content_overlap = {
+  local fake_content_overlap = wibox.container.background()
+  fake_content_overlap.bg = beautiful.titlebar_bg,
+  fake_content_overlap:setup {
+    widget = wibox.container.margin,
+    top = overlaping_content_size,
+  }
+
+  local fake_content_overlap_with_margins = {
     widget = wibox.container.margin,
     left = get_left_titlebar_size(),
     right = get_right_titlebar_size(),
-    {
-      widget = wibox.container.background,
-      bg = overlap_content_color or beautiful.titlebar_bg,
-      {
-        widget = wibox.container.margin,
-        top = overlaping_content_size,
-      },
-    },
+    fake_content_overlap,
   }
 
   return {
-      layout  = wibox.layout.align.vertical,
-      empty_space_above_title,
-      title,
-      fake_content_overlap,
+      fake_content_overlap = fake_content_overlap,
+      main_bar = {
+        layout  = wibox.layout.align.vertical,
+        empty_space_above_title,
+        title_box,
+        fake_content_overlap_with_margins,
+      },
   }
 end
 
 -- Add a titlebar if titlebars_enabled is set to true in the rules.
 client.connect_signal("request::titlebars", function(c)
-
-  local overlap_color = beautiful.titlebar_bg
 
   local top_tb = awful.titlebar(c, {
       position = 'top',
@@ -454,105 +493,44 @@ client.connect_signal("request::titlebars", function(c)
       size = get_right_titlebar_size(),
   })
 
+  local sun = get_sun(c)
+  local moon = get_moon(c)
+  local earth = get_earth(c)
+  local title = get_title(c)
+
   top_tb : setup {
       layout = wibox.layout.stack,
-      get_sun(c),
-      get_earth(c, "top"),
+      sun,
+      earth.top_earth,
       get_top_shadows(),
-      get_title(c),
-      get_moon(c),
+      title.main_bar,
+      moon,
   }
 
   bottom_tb : setup(get_bottom_shadows())
 
   left_tb: setup {
-     layout = wibox.layout.stack,
-     get_earth(c, "left"),
-     get_left_shadows(),
+      layout = wibox.layout.stack,
+      earth.left_earth,
+      get_left_shadows(),
   }
 
   right_tb : setup(get_right_shadows())
 
-  local sun_opacity = 0
-  local sun_x_offset = 10
-  local sun_y_offset = 10
-  local moon_opacity = 0
-  local moon_x_offset = 20
-  local moon_y_offset = -20
-  local earth_opacity = 0
-  local earth_x_offset = 30
 
-  local sun_timed = animations:new({
-      pos = 1,
-      duration = 0.5,
-      easing = animations.easing.outQuad,
-      update = function(self, t)
-        sun_x_offset = 10 * t
-        sun_y_offset = 10 * t
-        sun_opacity = 1 - t
-      end
-  })
-
-  local moon_timed = animations:new({
-      pos = 1,
-      duration = 0.5,
-      easing = animations.easing.outQuad,
-      update = function(self, t)
-        moon_x_offset = 20 * t
-        moon_y_offset = -20 * t
-        moon_opacity = 1 - t
-      end
-  })
-
-  local earth_timed = animations:new({
-      pos = 1,
-      duration = 0.5,
-      easing = animations.easing.outQuad,
-      update = function(self, t)
-        earth_x_offset = 30 * t
-        earth_opacity = 1 - t
-      end
-  })
-
-  local titlebar_icons_timed = animations:new({
-      pos = 0.8,
-      duration = 1,
-      easing = animations.easing.linear,
-      update = function(self, t)
-        top_tb : setup {
-          layout = wibox.layout.stack,
-          get_sun(c, sun_x_offset, sun_y_offset, sun_opacity),
-          get_earth(c, "top", earth_x_offset, 0, earth_opacity),
-          get_top_shadows(),
-          get_title(c, overlap_color),
-          get_moon(c, moon_x_offset, moon_y_offset, moon_opacity),
-        }
-
-        left_tb: setup {
-          layout = wibox.layout.stack,
-          get_earth(c, "left", earth_x_offset, 0, earth_opacity),
-          get_left_shadows(),
-        }
-      end
-  })
-  titlebar_icons_timed:set(0)
-  earth_timed:set(0)
-
+  earth.earth_timed:set(0)
 
   gears.timer.start_new(0.3, function()
-    sun_timed:set(0)
+    sun.timed:set(0)
   end)
 
-  gears.timer.start_new(0.1,function()
-    moon_timed:set(0)
+  gears.timer.start_new(0.1, function()
+    moon.timed:set(0)
   end)
 
-  gtimer_weak_start_new(0.02,function()
-    overlap_color = get_color(c)
-  end)
-
-  c:connect_signal("unmanage", function(c)
-    titlebar_icons_timed:stop()
+  gears.timer.start_new(0.02, function()
+    title.fake_content_overlap.bg = get_color(c)
+    title.fake_content_overlap:emit_signal("widget::redraw_needed")
   end)
 
 end)
