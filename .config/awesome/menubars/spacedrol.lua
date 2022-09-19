@@ -56,7 +56,7 @@ menubar_body_timed = rubato.timed {
 }
 
 local function theme_icon()
-  spacedrol_icon.image = theme.spacedrol_cold_icon
+  spacedrol_icon.image = theme.spacedrol_moon_icon
   spacedrol_icon_box.bg = theme.invisible
 end
 

@@ -162,6 +162,35 @@ local function get_sun(c)
   local x_offset = 20
   local y_offset = 20
 
+  local sun_icon = wibox.widget.imagebox()
+  sun_icon.image = beautiful.spacedrol_sun_icon
+  sun_icon.opacity = 1
+  local sun_icon_hover = wibox.widget.imagebox()
+  sun_icon_hover.image = beautiful.spacedrol_sun_tile_icon
+  sun_icon_hover.opacity = 0
+
+  local hover_timed = animations:new({
+      duration = 0.4,
+      easing = animations.easing.outQuad,
+      update = function(self, t)
+        sun_icon:set_opacity(1 - t)
+        sun_icon_hover:set_opacity(t)
+        sun_icon:emit_signal("widget::redraw_needed")
+      end
+  })
+
+  local sun_button_hitbox = awful.titlebar.widget.button(
+    c,
+    "Tile",
+    function() end,
+    function()
+      if not c.fixed then
+        hover_timed:set(0)
+        c.floating = not c.floating
+      end
+    end
+  )
+
   local top_margin  = get_empty_space_above_title() + sun_ypos - (sun_size / 2)
   local left_margin = get_left_titlebar_size() + sun_xpos - (sun_size / 2)
 
@@ -173,10 +202,8 @@ local function get_sun(c)
 
   sun:setup {
     layout = wibox.layout.stack,
-    {
-      widget = wibox.widget.imagebox,
-      image = beautiful.spacedrol_hot_icon,
-    },
+    sun_icon,
+    sun_icon_hover,
     {
       layout = wibox.layout.fixed.horizontal,
       {
@@ -188,22 +215,13 @@ local function get_sun(c)
           widget = wibox.container.background,
           --bg = "#ff0000",
           forced_width = 25,
-          awful.titlebar.widget.button(
-            c,
-            "Tile",
-            function() end,
-            function()
-              if not c.fixed then
-                c.floating = not c.floating
-              end
-            end
-          ),
+          sun_button_hitbox,
         },
       },
     },
   }
 
-  local sun_timed = animations:new({
+  local appear_timed = animations:new({
       pos = 1,
       duration = 0.5,
       easing = animations.easing.outQuad,
@@ -215,7 +233,9 @@ local function get_sun(c)
       end
   })
 
-  sun.timed = sun_timed
+  sun.appear_timed = appear_timed
+  sun.hover_timed = hover_timed
+  sun.button_hitbox = sun_button_hitbox
 
   return sun
 end
@@ -223,6 +243,33 @@ end
 local function get_moon(c)
   local x_offset = 20
   local y_offset = -20
+
+  local moon_icon = wibox.widget.imagebox()
+  moon_icon.image = beautiful.spacedrol_moon_icon
+  moon_icon.opacity = 1
+  local moon_icon_hover = wibox.widget.imagebox()
+  moon_icon_hover.image = beautiful.spacedrol_moon_close_icon
+  moon_icon_hover.opacity = 0
+
+  local hover_timed = animations:new({
+      duration = 0.4,
+      easing = animations.easing.outQuad,
+      update = function(self, t)
+        moon_icon:set_opacity(1 - t)
+        moon_icon_hover:set_opacity(t)
+        moon_icon:emit_signal("widget::redraw_needed")
+      end
+  })
+
+  local moon_button_hitbox = awful.titlebar.widget.button(
+    c,
+    "Close",
+    function() end,
+    function()
+      hover_timed:set(0)
+      c:kill()
+    end
+  )
 
   local top_margin  = get_empty_space_above_title() + moon_ypos - (moon_size / 2)
   local left_margin = get_left_titlebar_size() + moon_xpos - (moon_size / 2)
@@ -235,10 +282,8 @@ local function get_moon(c)
 
   moon:setup {
     layout = wibox.layout.stack,
-    {
-      widget = wibox.widget.imagebox,
-      image = beautiful.spacedrol_cold_icon,
-    },
+    moon_icon,
+    moon_icon_hover,
     {
       layout = wibox.layout.fixed.horizontal,
       {
@@ -248,18 +293,13 @@ local function get_moon(c)
           widget = wibox.container.background,
           --bg = "#00ff00",
           forced_width = 45,
-          awful.titlebar.widget.button(
-            c,
-            "Close",
-            function() end,
-            function() c:kill() end
-          ),
+          moon_button_hitbox,
         },
       },
     },
   }
 
-  local moon_timed = animations:new({
+  local appear_timed = animations:new({
       pos = 1,
       duration = 0.5,
       easing = animations.easing.outQuad,
@@ -271,7 +311,9 @@ local function get_moon(c)
       end
   })
 
-  moon.timed = moon_timed
+  moon.appear_timed = appear_timed
+  moon.hover_timed = hover_timed
+  moon.button_hitbox = moon_button_hitbox
 
   return moon
 end
@@ -280,12 +322,30 @@ local function get_earth(c)
   local x_offset = 30
   local y_offset = 0
 
+  local earth_icon = wibox.widget.imagebox()
+  earth_icon.image = beautiful.spacedrol_earth_icon
+  earth_icon.opacity = 1
+  local earth_icon_hover = wibox.widget.imagebox()
+  earth_icon_hover.image = beautiful.spacedrol_earth_max_icon
+  earth_icon_hover.opacity = 0
+
+  local hover_timed = animations:new({
+      duration = 0.4,
+      easing = animations.easing.outQuad,
+      update = function(self, t)
+        earth_icon:set_opacity(1 - t)
+        earth_icon_hover:set_opacity(t)
+        earth_icon:emit_signal("widget::redraw_needed")
+      end
+  })
+
   local earth_button_hitbox = awful.titlebar.widget.button(
     c,
     "Fullscreen",
     function() end,
     function()
       if not c.fixed then
+        hover_timed:set(0)
         c.fullscreen = not c.fullscreen
         c:raise()
       end
@@ -303,10 +363,8 @@ local function get_earth(c)
 
   top_earth:setup {
     layout = wibox.layout.stack,
-    {
-      widget = wibox.widget.imagebox,
-      image = beautiful.spacedrol_earth_icon,
-    },
+    earth_icon,
+    earth_icon_hover,
     {
       layout = wibox.layout.fixed.horizontal,
       {
@@ -345,10 +403,8 @@ local function get_earth(c)
 
   left_earth:setup {
     layout = wibox.layout.stack,
-    {
-      widget = wibox.widget.imagebox,
-      image = beautiful.spacedrol_earth_icon,
-    },
+    earth_icon,
+    earth_icon_hover,
     {
       layout = wibox.layout.fixed.vertical,
       {
@@ -365,7 +421,7 @@ local function get_earth(c)
     },
   }
 
-  local earth_timed = animations:new({
+  local appear_timed = animations:new({
       pos = 1,
       duration = 0.5,
       easing = animations.easing.outQuad,
@@ -385,14 +441,16 @@ local function get_earth(c)
   return {
     top_earth = top_earth,
     left_earth = left_earth,
-    earth_timed = earth_timed,
+    appear_timed = appear_timed,
+    hover_timed = hover_timed,
+    button_hitbox = earth_button_hitbox,
   }
 end
 
 local function get_color(c)
-    pb = pixbuf_get_from_surface(gears.surface(c.content), 200, 3, 1, 1)
-        bytes = pb:get_pixels()
-        return "#" .. bytes:gsub(".", function(c) return ("%02x"):format(c:byte()) end)
+  pb = pixbuf_get_from_surface(gears.surface(c.content), 200, 3, 1, 1)
+  bytes = pb:get_pixels()
+  return "#" .. bytes:gsub(".", function(c) return ("%02x"):format(c:byte()) end)
 end
 
 local function get_title(c)
@@ -518,19 +576,41 @@ client.connect_signal("request::titlebars", function(c)
   right_tb : setup(get_right_shadows())
 
 
-  earth.earth_timed:set(0)
+  earth.appear_timed:set(0)
 
   gears.timer.start_new(0.3, function()
-    sun.timed:set(0)
+    sun.appear_timed:set(0)
   end)
 
   gears.timer.start_new(0.1, function()
-    moon.timed:set(0)
+    moon.appear_timed:set(0)
   end)
 
   gears.timer.start_new(0.02, function()
     title.fake_content_overlap.bg = get_color(c)
     title.fake_content_overlap:emit_signal("widget::redraw_needed")
+  end)
+
+
+  sun.button_hitbox:connect_signal("mouse::enter", function()
+    sun.hover_timed:set(1)
+  end)
+  sun.button_hitbox:connect_signal("mouse::leave", function()
+    sun.hover_timed:set(0)
+  end)
+
+  moon.button_hitbox:connect_signal("mouse::enter", function()
+    moon.hover_timed:set(1)
+  end)
+  moon.button_hitbox:connect_signal("mouse::leave", function()
+    moon.hover_timed:set(0)
+  end)
+
+  earth.button_hitbox:connect_signal("mouse::enter", function()
+    earth.hover_timed:set(1)
+  end)
+  earth.button_hitbox:connect_signal("mouse::leave", function()
+    earth.hover_timed:set(0)
   end)
 
 end)

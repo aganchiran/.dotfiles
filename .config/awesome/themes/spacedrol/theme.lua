@@ -77,12 +77,15 @@ theme.menu_width  = dpi(100)
 -- }}}
 
 -- {{{ Misc
-theme.awesome_icon           = themes_path .. "spacedrol/logo/spacedrol-cold-icon.png"
-theme.spacedrol_cold_icon    = themes_path .. "spacedrol/logo/spacedrol-cold-icon.png"
-theme.spacedrol_hot_icon     = themes_path .. "spacedrol/logo/spacedrol-hot-icon.png"
-theme.spacedrol_earth_icon   = themes_path .. "spacedrol/logo/spacedrol-earth-icon.png"
-theme.rocket_icon            = themes_path .. "spacedrol/other_icons/rocket.png"
-theme.menu_submenu_icon      = original_themes_path .. "default/submenu.png"
+theme.awesome_icon              = themes_path .. "spacedrol/logo/spacedrol-moon-icon.png"
+theme.spacedrol_moon_icon       = themes_path .. "spacedrol/logo/spacedrol-moon-icon.png"
+theme.spacedrol_moon_close_icon = themes_path .. "spacedrol/logo/spacedrol-moon-close-icon.png"
+theme.spacedrol_sun_icon        = themes_path .. "spacedrol/logo/spacedrol-sun-icon.png"
+theme.spacedrol_sun_tile_icon   = themes_path .. "spacedrol/logo/spacedrol-sun-tile-icon.png"
+theme.spacedrol_earth_icon      = themes_path .. "spacedrol/logo/spacedrol-earth-icon.png"
+theme.spacedrol_earth_max_icon  = themes_path .. "spacedrol/logo/spacedrol-earth-max-icon.png"
+theme.rocket_icon               = themes_path .. "spacedrol/other_icons/rocket.png"
+theme.menu_submenu_icon         = original_themes_path .. "default/submenu.png"
 -- }}}
 
 -- {{{ Layout
