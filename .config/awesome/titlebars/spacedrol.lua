@@ -622,10 +622,10 @@ end)
 awful.titlebar.enable_tooltip = false
 client.connect_signal("property::floating", function(c)
 
-    local floating_geo = c.floating_geometry
-
     if(c.floating) then
-        if c.is_opened ~= true then
+        local floating_geo = c.floating_geometry
+
+        if c.is_opened ~= true and floating_geo then
           floating_geo.width = floating_geo.width + get_left_titlebar_size() + 5
           floating_geo.height = floating_geo.height + get_top_titlebar_size() + 5
         end
@@ -635,7 +635,7 @@ client.connect_signal("property::floating", function(c)
         awful.titlebar.show(c, "left")
         awful.titlebar.show(c, "right")
 
-        if not c.fixed then
+        if not c.fixed and floating_geo then
           floating_geo.width = math.min(floating_geo.width, c.screen.geometry.width - get_left_titlebar_size())
           floating_geo.height = math.min(floating_geo.height, c.screen.geometry.height - get_top_titlebar_size())
           c:geometry(floating_geo)
