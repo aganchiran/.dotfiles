@@ -613,19 +613,50 @@ client.connect_signal("request::titlebars", function(c)
     earth.hover_timed:set(0)
   end)
 
+  c:connect_signal("unmanage", function()
+    c.is_closing = true
+  end)
+
 end)
 
 awful.titlebar.enable_tooltip = false
 client.connect_signal("property::floating", function(c)
+
+    local floating_geo = c.floating_geometry
+
     if(c.floating) then
+        if c.is_opened ~= true then
+          floating_geo.width = floating_geo.width + get_left_titlebar_size() + 5
+          floating_geo.height = floating_geo.height + get_top_titlebar_size() + 5
+        end
+
         awful.titlebar.show(c, "top")
         awful.titlebar.show(c, "bottom")
         awful.titlebar.show(c, "left")
         awful.titlebar.show(c, "right")
+
+        if not c.fixed then
+          floating_geo.width = math.min(floating_geo.width, c.screen.geometry.width - get_left_titlebar_size())
+          floating_geo.height = math.min(floating_geo.height, c.screen.geometry.height - get_top_titlebar_size())
+          c:geometry(floating_geo)
+        end
+
+        if c.is_opened ~= true then
+          if #c.screen.all_clients - #c.screen.tiled_clients <= 1 then
+            awful.placement.centered(c)
+          else
+            awful.placement.no_overlap(c)
+          end
+
+          c.is_opened = true
+        end
+
     else
-        awful.titlebar.hide(c, "top")
-        awful.titlebar.hide(c, "bottom")
-        awful.titlebar.hide(c, "left")
-        awful.titlebar.hide(c, "right")
+        if c.is_closing ~= true then
+          awful.titlebar.hide(c, "top")
+          awful.titlebar.hide(c, "bottom")
+          awful.titlebar.hide(c, "left")
+          awful.titlebar.hide(c, "right")
+        end
     end
 end)
