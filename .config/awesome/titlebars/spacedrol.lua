@@ -96,66 +96,69 @@ local function get_edge_shadow(pos, height, width)
 end
 
 local function get_top_shadows()
-  return {
-    widget = wibox.container.margin,
-    left = get_left_titlebar_size() - beautiful.shadow_size,
+  local top_shadows = wibox.container.margin()
+  top_shadows.left = get_left_titlebar_size() - beautiful.shadow_size
+
+  top_shadows:setup{
+    layout = wibox.layout.fixed.vertical,
     {
-      layout = wibox.layout.fixed.vertical,
+      widget = wibox.container.background,
+      bg = beautiful.invisible,
       {
-        widget = wibox.container.background,
-        bg = beautiful.invisible,
-        {
-          widget = wibox.container.margin,
-          top = get_empty_space_above_title() - beautiful.shadow_size,
-        },
-      },
-      {
-        layout = wibox.layout.align.horizontal,
-        get_corner_shadow("top", "left", beautiful.shadow_size + visible_titlebar_radius),
-        {
-          layout = wibox.layout.fixed.vertical,
-          get_edge_shadow("top", beautiful.shadow_size),
-        },
-        get_corner_shadow("top", "right", beautiful.shadow_size + visible_titlebar_radius),
-      },
-      {
-        layout = wibox.layout.align.horizontal,
-        expand = inside,
-        get_edge_shadow("left", overlaping_content_size + visible_titlebar_size - visible_titlebar_radius, beautiful.shadow_size),
-        {
-          widget = wibox.container.margin,
-        },
-        get_edge_shadow("right", overlaping_content_size + visible_titlebar_size - visible_titlebar_radius, beautiful.shadow_size),
+        widget = wibox.container.margin,
+        top = get_empty_space_above_title() - beautiful.shadow_size,
       },
     },
+    {
+      layout = wibox.layout.align.horizontal,
+      get_corner_shadow("top", "left", beautiful.shadow_size + visible_titlebar_radius),
+      {
+        layout = wibox.layout.fixed.vertical,
+        get_edge_shadow("top", beautiful.shadow_size),
+      },
+      get_corner_shadow("top", "right", beautiful.shadow_size + visible_titlebar_radius),
+    },
+    {
+      layout = wibox.layout.align.horizontal,
+      expand = inside,
+      get_edge_shadow("left", overlaping_content_size + visible_titlebar_size - visible_titlebar_radius, beautiful.shadow_size),
+      {
+        widget = wibox.container.margin,
+      },
+      get_edge_shadow("right", overlaping_content_size + visible_titlebar_size - visible_titlebar_radius, beautiful.shadow_size),
+    },
   }
+
+  return top_shadows
 end
 
 local function get_bottom_shadows()
-  return {
-    widget = wibox.container.margin,
-    left = get_left_titlebar_size() - beautiful.shadow_size,
-    {
-      layout = wibox.layout.align.horizontal,
-      expand = 'inside',
-      get_corner_shadow("bottom", "left", beautiful.shadow_size),
-      get_edge_shadow("bottom"),
-      get_corner_shadow("bottom", "right", beautiful.shadow_size),
-    },
+  local bottom_shadows = wibox.container.margin()
+  bottom_shadows.left = get_left_titlebar_size() - beautiful.shadow_size
+
+  bottom_shadows:setup{
+    layout = wibox.layout.align.horizontal,
+    expand = 'inside',
+    get_corner_shadow("bottom", "left", beautiful.shadow_size),
+    get_edge_shadow("bottom"),
+    get_corner_shadow("bottom", "right", beautiful.shadow_size),
   }
 
+  return bottom_shadows
 end
 
 local function get_left_shadows()
-  return {
-    widget = wibox.container.margin,
-        left = get_left_titlebar_size() - beautiful.shadow_size,
-        get_edge_shadow("left"),
-    }
+  local left_shadows = wibox.container.margin()
+  left_shadows.left = get_left_titlebar_size() - beautiful.shadow_size
+  left_shadows:setup(get_edge_shadow("left"))
+
+  return left_shadows
 end
 
 local function get_right_shadows()
-  return get_edge_shadow("right")
+  local right_shadows = wibox.container.margin()
+  right_shadows:setup(get_edge_shadow("right"))
+  return right_shadows
 end
 
 local function get_sun(c)
@@ -168,6 +171,9 @@ local function get_sun(c)
   local sun_icon_hover = wibox.widget.imagebox()
   sun_icon_hover.image = beautiful.spacedrol_sun_tile_icon
   sun_icon_hover.opacity = 0
+  local sun_icon_unfocused = wibox.widget.imagebox()
+  sun_icon_unfocused.image = beautiful.spacedrol_sun_unfocused_icon
+  sun_icon_unfocused.opacity = 0
 
   local hover_timed = animations:new({
       duration = 0.4,
@@ -175,6 +181,15 @@ local function get_sun(c)
       update = function(self, t)
         sun_icon:set_opacity(1 - t)
         sun_icon_hover:set_opacity(t)
+        sun_icon:emit_signal("widget::redraw_needed")
+      end
+  })
+
+  local focus_timed = animations:new({
+      duration = 0.4,
+      easing = animations.easing.outQuad,
+      update = function(self, t)
+        sun_icon_unfocused:set_opacity(t)
         sun_icon:emit_signal("widget::redraw_needed")
       end
   })
@@ -204,6 +219,7 @@ local function get_sun(c)
     layout = wibox.layout.stack,
     sun_icon,
     sun_icon_hover,
+    sun_icon_unfocused,
     {
       layout = wibox.layout.fixed.horizontal,
       {
@@ -235,6 +251,7 @@ local function get_sun(c)
 
   sun.appear_timed = appear_timed
   sun.hover_timed = hover_timed
+  sun.focus_timed = focus_timed
   sun.button_hitbox = sun_button_hitbox
 
   return sun
@@ -250,6 +267,9 @@ local function get_moon(c)
   local moon_icon_hover = wibox.widget.imagebox()
   moon_icon_hover.image = beautiful.spacedrol_moon_close_icon
   moon_icon_hover.opacity = 0
+  local moon_icon_unfocused = wibox.widget.imagebox()
+  moon_icon_unfocused.image = beautiful.spacedrol_moon_unfocused_icon
+  moon_icon_unfocused.opacity = 0
 
   local hover_timed = animations:new({
       duration = 0.4,
@@ -257,6 +277,15 @@ local function get_moon(c)
       update = function(self, t)
         moon_icon:set_opacity(1 - t)
         moon_icon_hover:set_opacity(t)
+        moon_icon:emit_signal("widget::redraw_needed")
+      end
+  })
+
+  local focus_timed = animations:new({
+      duration = 0.4,
+      easing = animations.easing.linear,
+      update = function(self, t)
+        moon_icon_unfocused:set_opacity(t)
         moon_icon:emit_signal("widget::redraw_needed")
       end
   })
@@ -284,6 +313,7 @@ local function get_moon(c)
     layout = wibox.layout.stack,
     moon_icon,
     moon_icon_hover,
+    moon_icon_unfocused,
     {
       layout = wibox.layout.fixed.horizontal,
       {
@@ -313,6 +343,7 @@ local function get_moon(c)
 
   moon.appear_timed = appear_timed
   moon.hover_timed = hover_timed
+  moon.focus_timed = focus_timed
   moon.button_hitbox = moon_button_hitbox
 
   return moon
@@ -328,6 +359,9 @@ local function get_earth(c)
   local earth_icon_hover = wibox.widget.imagebox()
   earth_icon_hover.image = beautiful.spacedrol_earth_max_icon
   earth_icon_hover.opacity = 0
+  local earth_icon_unfocused = wibox.widget.imagebox()
+  earth_icon_unfocused.image = beautiful.spacedrol_earth_unfocused_icon
+  earth_icon_unfocused.opacity = 0
 
   local hover_timed = animations:new({
       duration = 0.4,
@@ -335,6 +369,15 @@ local function get_earth(c)
       update = function(self, t)
         earth_icon:set_opacity(1 - t)
         earth_icon_hover:set_opacity(t)
+        earth_icon:emit_signal("widget::redraw_needed")
+      end
+  })
+
+  local focus_timed = animations:new({
+      duration = 0.4,
+      easing = animations.easing.outQuad,
+      update = function(self, t)
+        earth_icon_unfocused:set_opacity(t)
         earth_icon:emit_signal("widget::redraw_needed")
       end
   })
@@ -365,6 +408,7 @@ local function get_earth(c)
     layout = wibox.layout.stack,
     earth_icon,
     earth_icon_hover,
+    earth_icon_unfocused,
     {
       layout = wibox.layout.fixed.horizontal,
       {
@@ -405,6 +449,7 @@ local function get_earth(c)
     layout = wibox.layout.stack,
     earth_icon,
     earth_icon_hover,
+    earth_icon_unfocused,
     {
       layout = wibox.layout.fixed.vertical,
       {
@@ -443,6 +488,7 @@ local function get_earth(c)
     left_earth = left_earth,
     appear_timed = appear_timed,
     hover_timed = hover_timed,
+    focus_timed = focus_timed,
     button_hitbox = earth_button_hitbox,
   }
 end
@@ -451,6 +497,71 @@ local function get_color(c)
   pb = pixbuf_get_from_surface(gears.surface(c.content), 200, 3, 1, 1)
   bytes = pb:get_pixels()
   return "#" .. bytes:gsub(".", function(c) return ("%02x"):format(c:byte()) end)
+end
+
+function get_color(source_color, target_color, t)
+    local source_r = color_channel_to_decimal(string.sub(source_color, 2, 3))
+    local source_g = color_channel_to_decimal(string.sub(source_color, 4, 5))
+    local source_b = color_channel_to_decimal(string.sub(source_color, 6, 7))
+
+    local target_r = color_channel_to_decimal(string.sub(target_color, 2, 3))
+    local target_g = color_channel_to_decimal(string.sub(target_color, 4, 5))
+    local target_b = color_channel_to_decimal(string.sub(target_color, 6, 7))
+
+    local interpolated_r = decimal_to_color_channel((target_r - source_r) * t + source_r)
+    local interpolated_g = decimal_to_color_channel((target_g - source_g) * t + source_g)
+    local interpolated_b = decimal_to_color_channel((target_b - source_b) * t + source_b)
+    --naughty.notify{text=color_channel_to_decimal("ff"), timeout=0}
+    return "#" .. interpolated_r .. interpolated_g .. interpolated_b
+end
+
+function color_channel_to_decimal(input)
+    input = string.upper(input)
+    local output = 0
+    local digits = 2
+    if string.len(input) ~= digits then
+      return 0
+    end
+
+
+    local values = "0123456789ABCDEF"
+    local base = 16
+
+    for i = digits, 1, -1 do
+        local number_pos = digits - i
+        local character = string.sub(input, i, i)
+        local decValue = string.find(values, character) - 1
+        output = output + decValue * math.pow(base, number_pos)
+    end
+
+    return tostring(output)
+end
+
+function decimal_to_color_channel(input)
+    input = math.max(math.min(math.floor(input), 255), 0)
+    local output = ""
+    local digits = 2
+
+    local values = "0123456789ABCDEF"
+    local base = 16
+    local D = 0
+
+    local pos = 0
+    while input > 0 do
+        pos=pos+1
+
+        D = math.floor(input % base + 1)
+        input = math.floor(input/base)
+        output=string.sub(values,D,D)..output
+    end
+
+
+    while pos < digits do
+        pos=pos+1
+        output = "0" .. output
+    end
+
+    return output
 end
 
 local function get_title(c)
@@ -472,35 +583,36 @@ local function get_title(c)
     top = get_empty_space_above_title(),
   }
 
-  local title_box = {
+  local title = awful.titlebar.widget.titlewidget(c)
+  title.align = "center"
+
+  local title_box = wibox.container.background()
+    title_box.bg = beautiful.titlebar_bg
+    title_box.shape = function(cr, width, height)
+        return gears.shape.partially_rounded_rect(cr, width, height, true, true, false, false, visible_titlebar_radius)
+    end,
+
+    title_box:setup{ -- Title
+      widget = wibox.container.margin,
+      left   = moon_xpos + (moon_size / 2),
+      right  = moon_xpos + (moon_size / 2),
+      {
+        layout  = wibox.layout.flex.horizontal,
+        buttons = buttons,
+        title,
+      },
+    }
+
+  local title_box_with_margins = {
     widget = wibox.container.margin,
     left = get_left_titlebar_size(),
     right = get_right_titlebar_size(),
-    {
-        widget = wibox.container.background,
-        bg = beautiful.titlebar_bg,
-        shape = function(cr, width, height)
-            return gears.shape.partially_rounded_rect(cr, width, height, true, true, false, false, visible_titlebar_radius)
-        end,
-
-        { -- Title
-          widget = wibox.container.margin,
-          left   = moon_xpos + (moon_size / 2),
-          right  = moon_xpos + (moon_size / 2),
-          {
-            layout  = wibox.layout.flex.horizontal,
-            buttons = buttons,
-            {
-              widget = awful.titlebar.widget.titlewidget(c),
-              align  = "center",
-            },
-          },
-        },
-    },
+    title_box,
   }
 
   local fake_content_overlap = wibox.container.background()
-  fake_content_overlap.bg = beautiful.titlebar_bg,
+  fake_content_overlap.bg = beautiful.titlebar_bg
+  fake_content_overlap.active = false
   fake_content_overlap:setup {
     widget = wibox.container.margin,
     top = overlaping_content_size,
@@ -513,12 +625,27 @@ local function get_title(c)
     fake_content_overlap,
   }
 
+  local focus_timed = animations:new({
+      duration = 0.4,
+      easing = animations.easing.outQuad,
+      update = function(self, t)
+        local interpolated_bg = get_color(beautiful.titlebar_bg, beautiful.titlebar_bg_unfocused, t)
+        local interpolated_fg = get_color(beautiful.titlebar_fg, beautiful.titlebar_fg_unfocused, t)
+        title_box:set_bg(interpolated_bg)
+        title:set_markup("<span color='" .. gears.color.ensure_pango_color(interpolated_fg) .. "'>" .. title.text .. "</span>")
+        if not fake_content_overlap.active then
+          fake_content_overlap:set_bg(interpolated_bg)
+        end
+      end
+  })
+
   return {
       fake_content_overlap = fake_content_overlap,
+      focus_timed = focus_timed,
       main_bar = {
         layout  = wibox.layout.align.vertical,
         empty_space_above_title,
-        title_box,
+        title_box_with_margins,
         fake_content_overlap_with_margins,
       },
   }
@@ -556,24 +683,53 @@ client.connect_signal("request::titlebars", function(c)
   local earth = get_earth(c)
   local title = get_title(c)
 
-  top_tb : setup {
+  local top_shadows = get_top_shadows()
+  local bottom_shadows = get_bottom_shadows()
+  local left_shadows = get_left_shadows()
+  local right_shadows = get_right_shadows()
+
+  local shadow_focus_timed = animations:new({
+      duration = 0.4,
+      easing = animations.easing.outQuad,
+      update = function(self, t)
+        local max_opacity = 0.7
+        local min_opacity = 0.3
+        local current_opacity = (max_opacity - min_opacity) * (1 - t) + min_opacity
+        top_shadows:set_opacity(current_opacity)
+        bottom_shadows:set_opacity(current_opacity)
+        left_shadows:set_opacity(current_opacity)
+        right_shadows:set_opacity(current_opacity)
+        top_shadows:emit_signal("widget::redraw_needed")
+        bottom_shadows:emit_signal("widget::redraw_needed")
+        left_shadows:emit_signal("widget::redraw_needed")
+        right_shadows:emit_signal("widget::redraw_needed")
+      end
+  })
+
+  top_tb:setup {
       layout = wibox.layout.stack,
       sun,
       earth.top_earth,
-      get_top_shadows(),
+      top_shadows,
       title.main_bar,
       moon,
   }
 
-  bottom_tb : setup(get_bottom_shadows())
-
-  left_tb: setup {
+  bottom_tb:setup {
       layout = wibox.layout.stack,
-      earth.left_earth,
-      get_left_shadows(),
+      bottom_shadows,
   }
 
-  right_tb : setup(get_right_shadows())
+  left_tb:setup {
+      layout = wibox.layout.stack,
+      earth.left_earth,
+      left_shadows,
+  }
+
+  right_tb:setup {
+      layout = wibox.layout.stack,
+      right_shadows,
+  }
 
 
   earth.appear_timed:set(0)
@@ -588,6 +744,7 @@ client.connect_signal("request::titlebars", function(c)
 
   gears.timer.start_new(0.02, function()
     title.fake_content_overlap.bg = get_color(c)
+    title.fake_content_overlap.active = true
     title.fake_content_overlap:emit_signal("widget::redraw_needed")
   end)
 
@@ -611,6 +768,22 @@ client.connect_signal("request::titlebars", function(c)
   end)
   earth.button_hitbox:connect_signal("mouse::leave", function()
     earth.hover_timed:set(0)
+  end)
+
+  c:connect_signal("focus", function()
+    sun.focus_timed:set(0)
+    moon.focus_timed:set(0)
+    earth.focus_timed:set(0)
+    title.focus_timed:set(0)
+    shadow_focus_timed:set(0)
+  end)
+
+  c:connect_signal("unfocus", function()
+    sun.focus_timed:set(1)
+    moon.focus_timed:set(1)
+    earth.focus_timed:set(1)
+    title.focus_timed:set(1)
+    shadow_focus_timed:set(1)
   end)
 
   c:connect_signal("unmanage", function()

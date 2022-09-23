@@ -47,8 +47,10 @@ theme.menubar_prompt_label  = ""
 -- }}}
 
 -- {{{ Titlebar
-theme.titlebar_bg   = theme.bg_normal
-theme.titlebar_fg   = theme.fg_normal
+theme.titlebar_bg           = theme.bg_normal
+theme.titlebar_bg_unfocused = "#484D53"
+theme.titlebar_fg           = theme.fg_normal
+theme.titlebar_fg_unfocused = "#DDDDDD"
 -- }}}
 
 -- {{{ Prompt
@@ -77,15 +79,18 @@ theme.menu_width  = dpi(100)
 -- }}}
 
 -- {{{ Misc
-theme.awesome_icon              = themes_path .. "spacedrol/logo/spacedrol-moon-icon.png"
-theme.spacedrol_moon_icon       = themes_path .. "spacedrol/logo/spacedrol-moon-icon.png"
-theme.spacedrol_moon_close_icon = themes_path .. "spacedrol/logo/spacedrol-moon-close-icon.png"
-theme.spacedrol_sun_icon        = themes_path .. "spacedrol/logo/spacedrol-sun-icon.png"
-theme.spacedrol_sun_tile_icon   = themes_path .. "spacedrol/logo/spacedrol-sun-tile-icon.png"
-theme.spacedrol_earth_icon      = themes_path .. "spacedrol/logo/spacedrol-earth-icon.png"
-theme.spacedrol_earth_max_icon  = themes_path .. "spacedrol/logo/spacedrol-earth-max-icon.png"
-theme.rocket_icon               = themes_path .. "spacedrol/other_icons/rocket.png"
-theme.menu_submenu_icon         = original_themes_path .. "default/submenu.png"
+theme.awesome_icon                   = themes_path .. "spacedrol/logo/spacedrol-moon-icon.png"
+theme.spacedrol_moon_icon            = themes_path .. "spacedrol/logo/spacedrol-moon-icon.png"
+theme.spacedrol_moon_close_icon      = themes_path .. "spacedrol/logo/spacedrol-moon-close-icon.png"
+theme.spacedrol_moon_unfocused_icon  = themes_path .. "spacedrol/logo/spacedrol-moon-unfocused-icon.png"
+theme.spacedrol_sun_icon             = themes_path .. "spacedrol/logo/spacedrol-sun-icon.png"
+theme.spacedrol_sun_tile_icon        = themes_path .. "spacedrol/logo/spacedrol-sun-tile-icon.png"
+theme.spacedrol_sun_unfocused_icon   = themes_path .. "spacedrol/logo/spacedrol-sun-unfocused-icon.png"
+theme.spacedrol_earth_icon           = themes_path .. "spacedrol/logo/spacedrol-earth-icon.png"
+theme.spacedrol_earth_max_icon       = themes_path .. "spacedrol/logo/spacedrol-earth-max-icon.png"
+theme.spacedrol_earth_unfocused_icon = themes_path .. "spacedrol/logo/spacedrol-earth-unfocused-icon.png"
+theme.rocket_icon                    = themes_path .. "spacedrol/other_icons/rocket.png"
+theme.menu_submenu_icon              = original_themes_path .. "default/submenu.png"
 -- }}}
 
 -- {{{ Layout
