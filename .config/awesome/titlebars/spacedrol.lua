@@ -14,8 +14,8 @@ local gtimer_weak_start_new = gtimer.weak_start_new
 
 
 local visible_titlebar_radius = 10
-local visible_titlebar_size = 24
-local overlaping_content_size = 12
+local visible_titlebar_size = 35
+local overlaping_content_size = 0
 
 local sun_xpos = -26
 local sun_ypos = 2
@@ -493,7 +493,7 @@ local function get_earth(c)
   }
 end
 
-local function get_color(c)
+local function get_fake_overlap_color(c)
   pb = pixbuf_get_from_surface(gears.surface(c.content), 200, 3, 1, 1)
   bytes = pb:get_pixels()
   return "#" .. bytes:gsub(".", function(c) return ("%02x"):format(c:byte()) end)
@@ -511,7 +511,7 @@ function get_color(source_color, target_color, t)
     local interpolated_r = decimal_to_color_channel((target_r - source_r) * t + source_r)
     local interpolated_g = decimal_to_color_channel((target_g - source_g) * t + source_g)
     local interpolated_b = decimal_to_color_channel((target_b - source_b) * t + source_b)
-    --naughty.notify{text=color_channel_to_decimal("ff"), timeout=0}
+
     return "#" .. interpolated_r .. interpolated_g .. interpolated_b
 end
 
@@ -742,12 +742,22 @@ client.connect_signal("request::titlebars", function(c)
     moon.appear_timed:set(0)
   end)
 
-  gears.timer.start_new(0.02, function()
-    title.fake_content_overlap.bg = get_color(c)
-    title.fake_content_overlap.active = true
-    title.fake_content_overlap:emit_signal("widget::redraw_needed")
-  end)
+  if overlaping_content_size <= 0 then
+    c.update_fake_overlap_color_function = function()
+      gears.timer.start_new(0.02, function()
+        fake_overlap_color = get_fake_overlap_color(c)
+        if fake_overlap_color ~= beautiful.titlebar_bg then
+          title.fake_content_overlap.active = true
+          title.fake_content_overlap.bg = fake_overlap_color
+          title.fake_content_overlap:emit_signal("widget::redraw_needed")
+        end
 
+        c:disconnect_signal("request::activate", c.update_fake_overlap_color_function)
+      end)
+    end
+
+    c:connect_signal("request::activate", c.update_fake_overlap_color_function)
+  end
 
   sun.button_hitbox:connect_signal("mouse::enter", function()
     sun.hover_timed:set(1)
