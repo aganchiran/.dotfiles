@@ -5,6 +5,7 @@ local wibox = require("wibox")
 local beautiful = require("beautiful")
 local naughty = require("naughty")
 local animations = require("lib.animations")
+local colors = require("lib.colors")
 
 local lgi = require("lgi")
 local gdk = lgi.Gdk
@@ -497,71 +498,6 @@ local function get_fake_overlap_color(c)
   pb = pixbuf_get_from_surface(gears.surface(c.content), 200, 3, 1, 1)
   bytes = pb:get_pixels()
   return "#" .. bytes:gsub(".", function(c) return ("%02x"):format(c:byte()) end)
-end
-
-function get_color(source_color, target_color, t)
-    local source_r = color_channel_to_decimal(string.sub(source_color, 2, 3))
-    local source_g = color_channel_to_decimal(string.sub(source_color, 4, 5))
-    local source_b = color_channel_to_decimal(string.sub(source_color, 6, 7))
-
-    local target_r = color_channel_to_decimal(string.sub(target_color, 2, 3))
-    local target_g = color_channel_to_decimal(string.sub(target_color, 4, 5))
-    local target_b = color_channel_to_decimal(string.sub(target_color, 6, 7))
-
-    local interpolated_r = decimal_to_color_channel((target_r - source_r) * t + source_r)
-    local interpolated_g = decimal_to_color_channel((target_g - source_g) * t + source_g)
-    local interpolated_b = decimal_to_color_channel((target_b - source_b) * t + source_b)
-
-    return "#" .. interpolated_r .. interpolated_g .. interpolated_b
-end
-
-function color_channel_to_decimal(input)
-    input = string.upper(input)
-    local output = 0
-    local digits = 2
-    if string.len(input) ~= digits then
-      return 0
-    end
-
-
-    local values = "0123456789ABCDEF"
-    local base = 16
-
-    for i = digits, 1, -1 do
-        local number_pos = digits - i
-        local character = string.sub(input, i, i)
-        local decValue = string.find(values, character) - 1
-        output = output + decValue * math.pow(base, number_pos)
-    end
-
-    return tostring(output)
-end
-
-function decimal_to_color_channel(input)
-    input = math.max(math.min(math.floor(input), 255), 0)
-    local output = ""
-    local digits = 2
-
-    local values = "0123456789ABCDEF"
-    local base = 16
-    local D = 0
-
-    local pos = 0
-    while input > 0 do
-        pos=pos+1
-
-        D = math.floor(input % base + 1)
-        input = math.floor(input/base)
-        output=string.sub(values,D,D)..output
-    end
-
-
-    while pos < digits do
-        pos=pos+1
-        output = "0" .. output
-    end
-
-    return output
 end
 
 local function get_title(c)

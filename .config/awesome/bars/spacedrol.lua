@@ -3,61 +3,46 @@ local gears = require("gears")
 local wibox = require("wibox")
 local menubar = require("menubars.spacedrol")
 local beautiful = require("beautiful")
+local animations = require("lib.animations")
+local naughty = require("naughty")
 
 -- Create a wibox for each screen and add it
 local taglist_buttons = gears.table.join(
-                    awful.button({ }, 1, function(t) t:view_only() end),
-                    awful.button({ modkey }, 1, function(t)
-                                              if client.focus then
-                                                  client.focus:move_to_tag(t)
-                                              end
-                                          end),
-                    awful.button({ }, 3, awful.tag.viewtoggle),
-                    awful.button({ modkey }, 3, function(t)
-                                              if client.focus then
-                                                  client.focus:toggle_tag(t)
-                                              end
-                                          end),
-                    awful.button({ }, 4, function(t) awful.tag.viewnext(t.screen) end),
-                    awful.button({ }, 5, function(t) awful.tag.viewprev(t.screen) end)
-                )
+    awful.button({ }, 1, function(t) t:view_only() end),
+    awful.button({ modkey }, 1, function(t)
+                              if client.focus then
+                                  client.focus:move_to_tag(t)
+                              end
+                          end),
+    awful.button({ }, 3, awful.tag.viewtoggle),
+    awful.button({ modkey }, 3, function(t)
+                              if client.focus then
+                                  client.focus:toggle_tag(t)
+                              end
+                          end),
+    awful.button({ }, 4, function(t) awful.tag.viewnext(t.screen) end),
+    awful.button({ }, 5, function(t) awful.tag.viewprev(t.screen) end)
+)
 
 local function refreshTagStatus(self, c3)
     local isSelected = c3.selected
     local hasSomethingInIt = #c3:clients() > 0
 
     if isSelected and hasSomethingInIt then
-        self:get_children_by_id('custom_round_bg')[1].bg = beautiful.bg_focus
-        self:get_children_by_id('custom_round_bg')[1].forced_width = 13
-        self:get_children_by_id('custom_round_bg')[1].forced_height = 13
-        self:get_children_by_id('custom_margins')[1].left = 5
-        self:get_children_by_id('custom_margins')[1].right = 5
-        self:get_children_by_id('custom_round_bg')[1].shape_border_width = 0
+        self.color_timed:set(1)
+        self.grow_timed:set(1)
 
     elseif isSelected then
-        self:get_children_by_id('custom_round_bg')[1].bg = beautiful.bg_secondary
-        self:get_children_by_id('custom_round_bg')[1].forced_width = 13
-        self:get_children_by_id('custom_round_bg')[1].forced_height = 13
-        self:get_children_by_id('custom_margins')[1].left = 5
-        self:get_children_by_id('custom_margins')[1].right = 5
-        self:get_children_by_id('custom_round_bg')[1].shape_border_width = 0
+        self.color_timed:set(0)
+        self.grow_timed:set(1)
 
     elseif hasSomethingInIt then
-        self:get_children_by_id('custom_round_bg')[1].bg = beautiful.invisible
-        self:get_children_by_id('custom_round_bg')[1].forced_width = 13
-        self:get_children_by_id('custom_round_bg')[1].forced_width = 13
-        self:get_children_by_id('custom_margins')[1].left = 5
-        self:get_children_by_id('custom_margins')[1].right = 5
-        self:get_children_by_id('custom_round_bg')[1].shape_border_width = 2
+        self.color_timed:set(2)
+        self.grow_timed:set(1)
 
     else
-        self:get_children_by_id('custom_round_bg')[1].bg = beautiful.bg_secondary
-        self:get_children_by_id('custom_round_bg')[1].forced_width = 5
-        self:get_children_by_id('custom_round_bg')[1].forced_height = 5
-        self:get_children_by_id('custom_margins')[1].left = 9
-        self:get_children_by_id('custom_margins')[1].right = 9
-        self:get_children_by_id('custom_round_bg')[1].shape_border_width = 0
-
+        self.color_timed:set(0)
+        self.grow_timed:set(0)
     end
 end
 
@@ -92,13 +77,15 @@ awful.screen.connect_for_each_screen(function(s)
         widget_template = {
             id     = 'custom_margins',
             widget = wibox.container.margin,
-            left   = 5,
-            right  = 5,
+            left   = 9,
+            right  = 9,
             {
                 id     = 'custom_round_bg',
                 shape  = gears.shape.circle,
                 widget = wibox.container.background,
-                shape_border_color = beautiful.bg_focus,
+                shape_border_width = 2,
+                forced_width = 5,
+                forced_height = 5,
                 {
                     id     = 'text_role',
                     align  = 'center',
@@ -107,6 +94,41 @@ awful.screen.connect_for_each_screen(function(s)
                 },
             },
             create_callback = function(self, c3)
+                local round_bg = self:get_children_by_id('custom_round_bg')[1]
+                local margins = self:get_children_by_id('custom_margins')[1]
+                local size_full = 23
+                local size_max = 13
+                local size_min = 5
+
+                self.grow_timed = animations:new({
+                    duration = 0.2,
+                    easing = animations.easing.outQuad,
+                    update = function(self, t)
+                        local size_current    = (size_max - size_min) * t + size_min
+                        local margins_current = (size_full - size_current) / 2
+
+                        round_bg.forced_width  = size_current
+                        round_bg.forced_height = size_current
+                        margins.left  = margins_current
+                        margins.right = margins_current
+                    end
+                })
+
+                self.color_timed = animations:new({
+                    duration = 0.4,
+                    easing = animations.easing.outQuad,
+                    update = function(self, t)
+                        if t <= 1 then
+                            local current_color = get_color(beautiful.bg_secondary, beautiful.bg_focus, t)
+                            round_bg.bg = current_color
+                            round_bg.shape_border_color = current_color
+                        else
+                            round_bg.bg = get_color(beautiful.bg_focus, beautiful.bg_focus .. "00", t - 1)
+                        end
+                    end
+                })
+
+
                 refreshTagStatus(self, c3)
             end,
             update_callback = function(self, c3)
@@ -120,72 +142,65 @@ awful.screen.connect_for_each_screen(function(s)
     s.mywibox = awful.wibar({
             position = "bottom",
             screen = s ,
-            -- shape = gears.shape.rounded_bar,
-            -- width = 1000,
             input_passthrough = true,
             height = 38,
-            bg = beautiful.invisible
+            bg = beautiful.invisible,
     })
 
-    -- Create padding of the windows
-    -- s.padding = {
-    --     top = 4,
-    --     left = 4,
-    --     right = 4,
-    --     bottom = 8,
-    -- }
+    s.mywibox.bar_bg_timed = animations:new({
+        duration = 0.4,
+        easing = animations.easing.outQuad,
+        update = function(self, t)
+            s.mywibox.bg = get_color(beautiful.invisible, beautiful.bg_normal, t)
+        end
+    })
 
     -- Add widgets to the wibox
     s.mywibox:setup {
-        widget = wibox.container.background,
-        id     = "background_role",
-        bg     = beautiful.invisible,
-        {
-            layout = wibox.layout.align.horizontal,
-            expand = 'outside',
+        layout = wibox.layout.align.horizontal,
+        expand = 'outside',
 
-            { -- Left widgets
-                widget = wibox.container.place,
-                halign = 'left',
+        { -- Left widgets
+            widget = wibox.container.place,
+            halign = 'left',
+            {
+                widget = wibox.container.margin,
+                margins = 5,
+                mylauncher,
+            },
+        },
+        {
+            widget = wibox.container.place,
+            {
+                widget = wibox.container.background,
+                shape  = gears.shape.rounded_bar,
+                bg     = beautiful.bg_secondary,
                 {
                     widget = wibox.container.margin,
-                    margins = 5,
-                    mylauncher,
+                    margins = 8,
+                    s.mytaglist,
                 },
             },
+        },
+        { -- Right widgets
+            widget = wibox.container.place,
+            halign = 'right',
             {
-                widget = wibox.container.place,
+                widget = wibox.container.background,
+                shape  = gears.shape.rounded_bar,
+                bg     = beautiful.bg_secondary,
+                forced_height = 30,
                 {
-                    widget = wibox.container.background,
-                    shape  = gears.shape.rounded_bar,
-                    bg     = beautiful.bg_secondary,
+                    widget = wibox.container.margin,
+                    top = 6,
+                    bottom = 6,
+                    right = 0,
+                    left = 10,
                     {
-                        widget = wibox.container.margin,
-                        margins = 8,
-                        s.mytaglist,
-                    },
-                },
-            },
-            { -- Right widgets
-                widget = wibox.container.place,
-                halign = 'right',
-                {
-                    widget = wibox.container.background,
-                    shape  = gears.shape.rounded_bar,
-                    bg     = beautiful.bg_secondary,
-                    forced_height = 30,
-                    {
-                        widget = wibox.container.margin,
-                        top = 6,
-                        bottom = 6,
-                        right = 0,
-                        left = 10,
-                        {
-                            layout = wibox.layout.fixed.horizontal,
-                            mytextclock,
-                            wibox.widget.systray(),
-                            s.mylayoutbox,
-                        },
+                        layout = wibox.layout.fixed.horizontal,
+                        mytextclock,
+                        wibox.widget.systray(),
+                        s.mylayoutbox,
                     },
                 },
             },
@@ -199,14 +214,9 @@ screen.connect_signal("arrange", function (s)
     local more_than_one_tiled = #s.tiled_clients >= 1
     local wibar = s.mywibox
 
-    assert(wibar.get_children_by_id,"The given widget template did not result in a"..
-        "layout with a 'get_children_by_id' method")
-
-    local wibar_background = wibar:get_children_by_id("background_role")[1]
-
-    if more_than_one_tiled and wibar.get_children_by_id then
-        wibar_background.bg = beautiful.bg_normal
+    if more_than_one_tiled then
+        wibar.bar_bg_timed:set(1)
     else
-        wibar_background.bg = beautiful.invisible
+        wibar.bar_bg_timed:set(0)
     end
 end)
