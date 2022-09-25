@@ -109,8 +109,7 @@ awful.screen.connect_for_each_screen(function(s)
 
                         round_bg.forced_width  = size_current
                         round_bg.forced_height = size_current
-                        margins.left  = margins_current
-                        margins.right = margins_current
+                        margins.margins  = margins_current
                     end
                 })
 
@@ -177,7 +176,10 @@ awful.screen.connect_for_each_screen(function(s)
                 bg     = beautiful.bg_secondary,
                 {
                     widget = wibox.container.margin,
-                    margins = 8,
+                    right = 8,
+                    left = 8,
+                    top = 4,
+                    bottom = 4,
                     s.mytaglist,
                 },
             },
