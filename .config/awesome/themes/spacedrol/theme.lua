@@ -75,7 +75,7 @@ theme.menu_width  = dpi(100)
 -- {{{ Taglist
 -- theme.taglist_squares_sel   = original_themes_path .. "zenburn/taglist/squarefz.png"
 -- theme.taglist_squares_unsel = original_themes_path .. "zenburn/taglist/squarez.png"
---theme.taglist_squares_resize = "false"
+-- theme.taglist_squares_resize = "false"
 -- }}}
 
 -- {{{ Misc
@@ -83,6 +83,7 @@ theme.awesome_icon                   = themes_path .. "spacedrol/logo/spacedrol-
 theme.spacedrol_moon_icon            = themes_path .. "spacedrol/logo/spacedrol-moon-icon.png"
 theme.spacedrol_moon_close_icon      = themes_path .. "spacedrol/logo/spacedrol-moon-close-icon.png"
 theme.spacedrol_moon_unfocused_icon  = themes_path .. "spacedrol/logo/spacedrol-moon-unfocused-icon.png"
+theme.spacedrol_moon_shadow_icon     = themes_path .. "spacedrol/logo/spacedrol-moon-shadow-icon.png"
 theme.spacedrol_sun_icon             = themes_path .. "spacedrol/logo/spacedrol-sun-icon.png"
 theme.spacedrol_sun_tile_icon        = themes_path .. "spacedrol/logo/spacedrol-sun-tile-icon.png"
 theme.spacedrol_sun_unfocused_icon   = themes_path .. "spacedrol/logo/spacedrol-sun-unfocused-icon.png"

@@ -263,7 +263,7 @@ local function get_moon(c)
   local y_offset = -20
 
   local moon_icon = wibox.widget.imagebox()
-  moon_icon.image = beautiful.spacedrol_moon_icon
+  moon_icon.image = beautiful.spacedrol_moon_shadow_icon
   moon_icon.opacity = 1
   local moon_icon_hover = wibox.widget.imagebox()
   moon_icon_hover.image = beautiful.spacedrol_moon_close_icon
