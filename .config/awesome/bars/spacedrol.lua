@@ -48,7 +48,7 @@ end
 
 mylauncher = wibox.widget {
     widget = wibox.widget.imagebox,
-    image  = beautiful.spacedrol_moon_icon,
+    image  = beautiful.awesome_smol_icon,
 }
 
 mylauncher:connect_signal("button::release", function(c) menubar.show() end)

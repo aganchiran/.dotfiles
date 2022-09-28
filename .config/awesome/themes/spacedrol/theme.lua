@@ -79,7 +79,8 @@ theme.menu_width  = dpi(100)
 -- }}}
 
 -- {{{ Misc
-theme.awesome_icon                   = themes_path .. "spacedrol/logo/spacedrol-moon-icon.png"
+theme.awesome_icon                   = themes_path .. "spacedrol/logo/droller.png"
+theme.awesome_smol_icon              = themes_path .. "spacedrol/logo/droller_small.png"
 theme.spacedrol_moon_icon            = themes_path .. "spacedrol/logo/spacedrol-moon-icon.png"
 theme.spacedrol_moon_close_icon      = themes_path .. "spacedrol/logo/spacedrol-moon-close-icon.png"
 theme.spacedrol_moon_unfocused_icon  = themes_path .. "spacedrol/logo/spacedrol-moon-unfocused-icon.png"
