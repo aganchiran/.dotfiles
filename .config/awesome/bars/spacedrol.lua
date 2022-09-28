@@ -83,7 +83,7 @@ awful.screen.connect_for_each_screen(function(s)
                 id     = 'custom_round_bg',
                 shape  = gears.shape.circle,
                 widget = wibox.container.background,
-                shape_border_width = 2,
+                shape_border_width = 0,
                 forced_width = 5,
                 forced_height = 5,
                 {
@@ -121,8 +121,10 @@ awful.screen.connect_for_each_screen(function(s)
                             local current_color = get_color(beautiful.bg_secondary, beautiful.bg_focus, t)
                             round_bg.bg = current_color
                             round_bg.shape_border_color = current_color
+                            round_bg.shape_border_width = 0
                         else
                             round_bg.bg = get_color(beautiful.bg_focus, beautiful.bg_focus .. "00", t - 1)
+                            round_bg.shape_border_width = 2
                         end
                     end
                 })
