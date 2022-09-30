@@ -26,7 +26,7 @@ theme.bg_urgent     = "#FCF17D"
 theme.bg_systray    = theme.bg_normal
 
 theme.invisible     = "#00000000"
-theme.shadow_color  = "#00000088"
+theme.shadow_color  = "#0F0F0F88"
 theme.shadow_size   = 5
 -- }}}
 
