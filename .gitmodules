@@ -1,3 +1,3 @@
 [submodule ".config/awesome/lib/rubato"]
 	path = .config/awesome/lib/rubato
-	url = git@github.com:andOrlando/rubato.git
+	url = https://github.com/andOrlando/rubato.git
