@@ -139,8 +139,8 @@ screen.connect_signal("arrange", function (s)
     local only_one_tiled = #s.tiled_clients == 1
     local is_max_fullscreen = awful.layout.get(s) == awful.layout.suit.max.fullscreen
 
-    for _, c in pairs(s.clients) do
-        if c.floating or only_one_tiled or is_max_fullscreen then
+    for _, c in pairs(s.tiled_clients) do
+        if only_one_tiled or is_max_fullscreen then
             c.border_width = 0
         else
             c.border_width = beautiful.border_width
