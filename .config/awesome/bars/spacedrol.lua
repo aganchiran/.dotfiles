@@ -60,7 +60,7 @@ mytextclock = wibox.widget.textclock()
 awful.screen.connect_for_each_screen(function(s)
 
     -- Each screen has its own tag table.
-    awful.tag({ "", "", "", "", "", "", "", "", "" }, s, awful.layout.layouts[1])
+    awful.tag({ "1", "2", "3", "4", "5", "6", "7", "8", "9" }, s, awful.layout.layouts[1])
 
     -- Create an imagebox widget which will contain an icon indicating which layout we're using.
     -- We need one layoutbox per screen.
@@ -87,10 +87,10 @@ awful.screen.connect_for_each_screen(function(s)
                 forced_width = 5,
                 forced_height = 5,
                 {
-                    id     = 'text_role',
+                    widget = wibox.widget.textbox,
+                    --id     = 'text_role',
                     align  = 'center',
                     valign = 'center',
-                    widget = wibox.widget.textbox,
                 },
             },
             create_callback = function(self, c3)
