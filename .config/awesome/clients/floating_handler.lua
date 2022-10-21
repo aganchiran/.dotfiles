@@ -105,6 +105,11 @@ client.connect_signal("manage", function (c)
         else
             client_groups[c.first_tag.name][c.group_window][c.window] = "secondary"
         end
+    elseif not client_groups[c.first_tag.name][c.group_window] then
+        awful.titlebar.hide(c, "top")
+        awful.titlebar.hide(c, "bottom")
+        awful.titlebar.hide(c, "left")
+        awful.titlebar.hide(c, "right")
     end
 
     if awesome.startup
