@@ -137,7 +137,18 @@ end)
 -- {{{ Disable borders when fullscreen
 screen.connect_signal("arrange", function (s)
     local only_one_tiled = #s.tiled_clients == 1
+    local more_than_one_tiled = #s.tiled_clients >= 1
     local is_max_fullscreen = awful.layout.get(s) == awful.layout.suit.max.fullscreen
+
+    if more_than_one_tiled then
+        gears.timer.start_new(1, function()
+            if #s.tiled_clients >= 1 then
+                awful.spawn('bash -c "killall mpv"')
+            end
+        end)
+    else
+        awful.spawn('bash -c "xwinwrap -ov -g 1920x1080+0+0 -- mpv -wid WID ~/.dotfiles/.config/awesome/themes/spacedrol/spacedrol-background.m4v --no-osc --no-osd-bar --loop-file --player-operation-mode=cplayer --no-audio --panscan=1.0 --no-input-default-bindings &"')
+    end
 
     for _, c in pairs(s.tiled_clients) do
         if only_one_tiled or is_max_fullscreen then
