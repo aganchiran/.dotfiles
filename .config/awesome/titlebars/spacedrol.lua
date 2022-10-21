@@ -740,13 +740,13 @@ end)
 
 awful.titlebar.enable_tooltip = false
 client.connect_signal("property::floating", function(c)
-
     if c.fullscreen then
         c:geometry({
             width = c.screen.geometry.width,
             height = c.screen.geometry.height,
         })
     elseif c.floating then
+        c.border_width = 0
         local floating_geo = c.floating_geometry
 
         if c.is_opened ~= true and floating_geo then
