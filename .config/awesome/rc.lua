@@ -434,5 +434,5 @@ client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_n
 
 -- {{{ Startup
 awful.spawn("picom")
-awful.spawn('bash -c "xwinwrap -ov -g 1920x1080+0+0 -- mpv -wid WID ~/.dotfiles/.config/awesome/themes/spacedrol/spacedrol-background.mov --no-osc --no-osd-bar --loop-file --player-operation-mode=cplayer --no-audio --panscan=1.0 --no-input-default-bindings &"')
+awful.spawn('bash -c "xwinwrap -ov -g 1920x1080+0+0 -- mpv -wid WID ~/.dotfiles/.config/awesome/themes/spacedrol/spacedrol-background.m4v --no-osc --no-osd-bar --loop-file --player-operation-mode=cplayer --no-audio --panscan=1.0 --no-input-default-bindings &"')
 -- }}}
